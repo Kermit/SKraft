@@ -11,11 +11,12 @@ namespace SKraft
     class Cube
     {
         private Model model;
-        private Matrix world = Matrix.Identity;
+        private Texture2D texture;
 
         public void LoadContent(ContentManager content)
         {
-            model = content.Load<Model>(@"models\cube");
+            model = content.Load<Model>(@"models\cube2");
+            texture = content.Load<Texture2D>(@"textures\texture2");
         }
 
         Vector3 modelPosition = Vector3.Zero;
@@ -34,6 +35,9 @@ namespace SKraft
                 // as our camera and projection.
                 foreach (BasicEffect effect in mesh.Effects)
                 {
+                    //effect.VertexColorEnabled = true;
+                    effect.Texture = texture;
+                    //effect.TextureEnabled = true;
                     effect.EnableDefaultLighting();
                     effect.World = transforms[mesh.ParentBone.Index] *
                         Matrix.CreateRotationY(modelRotation)
