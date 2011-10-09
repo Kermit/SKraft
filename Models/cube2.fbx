@@ -11,9 +11,9 @@ FBXHeaderExtension:  {
 		Year: 2011
 		Month: 10
 		Day: 09
-		Hour: 00
-		Minute: 23
-		Second: 50
+		Hour: 13
+		Minute: 21
+		Second: 26
 		Millisecond: 0
 	}
 	Creator: "FBX SDK/FBX Plugins build 20070228"
@@ -21,7 +21,7 @@ FBXHeaderExtension:  {
 		FlagPLE: 0
 	}
 }
-CreationTime: "2011-10-09 00:23:50:000"
+CreationTime: "2011-10-09 13:21:26:000"
 Creator: "Blender version 2.59 (sub 0)"
 
 ; Object definitions
@@ -64,7 +64,7 @@ Objects:  {
 			Property: "Visibility", "Visibility", "A+",1
 			Property: "Lcl Translation", "Lcl Translation", "A+",-0.014008004218340,-0.031156260520220,0.000453167333035
 			Property: "Lcl Rotation", "Lcl Rotation", "A+",0.000000000000000,-0.000000000000000,0.000000000000000
-			Property: "Lcl Scaling", "Lcl Scaling", "A+",1.000000000000000,1.000000000000000,1.000000000000000
+			Property: "Lcl Scaling", "Lcl Scaling", "A+",0.499999761581421,0.499999761581421,0.500000000000000
 			Property: "RotationOffset", "Vector3D", "",0,0,0
 			Property: "RotationPivot", "Vector3D", "",0,0,0
 			Property: "ScalingOffset", "Vector3D", "",0,0,0
@@ -286,7 +286,7 @@ Objects:  {
 		NbPoseNodes: 1
 		PoseNode:  {
 			Node: "Model::Cube"
-			Matrix: 1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,1.000000000000000,0.000000000000000,-0.014008004218340,-0.031156260520220,0.000453167333035,1.000000000000000
+			Matrix: 0.499999761581421,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.499999761581421,0.000000000000000,0.000000000000000,0.000000000000000,0.000000000000000,0.500000000000000,0.000000000000000,-0.014008004218340,-0.031156260520220,0.000453167333035,1.000000000000000
 		}
 	}
 	GlobalSettings:  {

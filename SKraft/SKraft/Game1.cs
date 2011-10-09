@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using SKraft.Cameras;
+using SKraft.Cubes;
 
 namespace SKraft
 {
@@ -18,15 +20,16 @@ namespace SKraft
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        private Camera camera;
-        Cube cube = new Cube();
+        List<Cube> cubes = new List<Cube>();
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 1440;
+            graphics.PreferredBackBufferHeight = 900;
+            graphics.ApplyChanges();
             Content.RootDirectory = "Content";
-            camera = new Camera(this, new Vector3(0, 10f, 10f), Vector3.Zero, Vector3.Up);
-            Components.Add(camera);
+            Components.Add(new FppCamera(this, new Vector3(0, 10f, 10f), Vector3.Zero, Vector3.Up));
         }
 
         /// <summary>
@@ -38,7 +41,13 @@ namespace SKraft
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            for (int x = 0; x < 4; ++x)
+            {
+                for (int z = 0; z < 4; ++z)
+                {
+                    cubes.Add(new SampleCube(new Vector3(x, 0, z)));
+                }
+            }
             base.Initialize();
         }
 
@@ -50,7 +59,11 @@ namespace SKraft
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            cube.LoadContent(Content);
+
+            foreach (Cube cube in cubes)
+            {
+                cube.LoadContent(Content);
+            }
             // TODO: use this.Content to load your game content here
         }
 
@@ -74,10 +87,10 @@ namespace SKraft
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // TODO: Add your update logic here
-
-            camera.Update(gameTime);
-
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                this.Exit();
+            }
             base.Update(gameTime);
         }
 
@@ -89,8 +102,10 @@ namespace SKraft
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
-            cube.Draw(camera);
+            foreach (Cube cube in cubes)
+            {
+                cube.Draw();
+            }
 
             base.Draw(gameTime);
         }

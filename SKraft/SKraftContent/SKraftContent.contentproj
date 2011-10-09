@@ -42,13 +42,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\cube2.fbx">
-      <Name>cube2</Name>
+    <Compile Include="Models\cube.fbx">
+      <Name>cube</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="Models\texture.png">
       <Name>texture</Name>
