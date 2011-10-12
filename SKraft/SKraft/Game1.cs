@@ -29,7 +29,7 @@ namespace SKraft
             graphics.PreferredBackBufferHeight = 900;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
-            Components.Add(new FppCamera(this, new Vector3(0, 10f, 10f), Vector3.Zero, Vector3.Up));
+            Components.Add(new FppCamera(this, new Vector3(0, 2, 10), Vector3.Zero, Vector3.Up));
         }
 
         /// <summary>
@@ -41,9 +41,9 @@ namespace SKraft
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            for (int x = 0; x < 4; ++x)
+            for (int x = 0; x < 20; ++x)
             {
-                for (int z = 0; z < 4; ++z)
+                for (int z = 0; z < 20; ++z)
                 {
                     cubes.Add(new SampleCube(new Vector3(x, 0, z)));
                 }

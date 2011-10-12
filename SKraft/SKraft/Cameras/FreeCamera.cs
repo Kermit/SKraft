@@ -9,8 +9,6 @@ namespace SKraft.Cameras
 {
     class FreeCamera : Camera
     {
-        public override Matrix View { get; protected set; }
-
         private Vector2 mousePos;
 
         public FreeCamera(Game game, Vector3 position, Vector3 target, Vector3 up) : base(game, position, target, up) { }

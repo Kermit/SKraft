@@ -16,7 +16,7 @@ namespace SKraft.Cameras
     {
         public static Camera ActiveCamera { get; set; }
         public Matrix Projection { get; protected set; }
-        public abstract Matrix View { get; protected set; }
+        public Matrix View { get; protected set; }
 
         public Camera(Game game, Vector3 position, Vector3 target, Vector3 up)
             : base(game)
@@ -25,7 +25,7 @@ namespace SKraft.Cameras
             Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
                                                              (float)Game.Window.ClientBounds.Width /
                                                              (float)Game.Window.ClientBounds.Height, 0.5f, 1000);
-
+            
             if (ActiveCamera == null)
             {
                 ActiveCamera = this;
