@@ -13,14 +13,17 @@ namespace SKraft.Cameras
         public float Speed { get; set; }
         public float MouseSpeed { get; set; }
 
+        private Game game;
         private Vector3 position;
         private Vector3 target;
         private Vector2 mousePos;
 
-        public FppCamera(Game game, Vector3 position, Vector3 target, Vector3 up) : base(game, position, target, up)
+        public FppCamera(Game _game, Vector3 position, Vector3 target, Vector3 up) : base(_game, position, target, up)
         {
             this.position = position;
             this.target = target;
+
+            game = _game;
 
             mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Speed = 0.1f;
@@ -53,6 +56,31 @@ namespace SKraft.Cameras
 
             mousePos.X = Mouse.GetState().X;
             mousePos.Y = Mouse.GetState().Y;
+
+            if (game.IsActive)
+            {
+                if (mousePos.X <= 0)
+                {
+                    mousePos.X = game.GraphicsDevice.Viewport.Width;
+                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                }
+                else if (mousePos.X >= game.GraphicsDevice.Viewport.Width)
+                {
+                    mousePos.X = 0;
+                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                }
+
+                if (mousePos.Y <= 0)
+                {
+                    mousePos.Y = 0;
+                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                }
+                else if (mousePos.Y >= game.GraphicsDevice.Viewport.Height)
+                {
+                    mousePos.Y = game.GraphicsDevice.Viewport.Height;
+                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                }
+            }
 
             Matrix forwardMovement = Matrix.CreateRotationY(target.X);
             KeyboardState state = Keyboard.GetState();
