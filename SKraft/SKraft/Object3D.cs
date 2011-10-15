@@ -67,7 +67,7 @@ namespace SKraft
             }
         }
 
-        public virtual void Draw()
+        public virtual void Draw(bool last)
         {
             if (this.Exists && !this.IsInInventory)
             {
@@ -83,6 +83,11 @@ namespace SKraft
                     {
                         foreach (BasicEffect effect in mesh.Effects)
                         {
+                            effect.FogEnabled = true;
+                            effect.FogColor = Color.CornflowerBlue.ToVector3();
+                            effect.FogStart = 17f;
+                            effect.FogEnd = 21f;
+
                             if (texture != null)
                             {
                                 effect.Texture = texture;

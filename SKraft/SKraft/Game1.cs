@@ -113,7 +113,7 @@ namespace SKraft
 
             for (int i = 0; i < objects3D.Count; ++i)
             {
-                objects3D[i].Draw();
+                objects3D[i].Draw(i == objects3D.Count - 1);
             }
 
             this.Window.Title = "FPS: " + fpsCounter.Update(gameTime);
