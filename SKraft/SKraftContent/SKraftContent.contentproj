@@ -45,7 +45,7 @@
     <Compile Include="Models\cube.fbx">
       <Name>cube</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>InstancedModelProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +67,26 @@
       <Name>texture2low</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\InstancedModel.fx">
+      <Name>InstancedModel</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SKraftPipeline\InstancedModelPipeline.csproj">
+      <Project>{FF69FD90-8834-4F60-ADA5-36387F112437}</Project>
+      <Name>InstancedModelPipeline</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Cats.fbx">
+      <Name>Cats</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>InstancedModelProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

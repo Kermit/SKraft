@@ -35,6 +35,11 @@ namespace SKraft
 
         public bool Exists { get; protected set; }
 
+        public virtual Matrix getPos()
+        {
+            return Matrix.CreateTranslation(position);
+        }
+
         protected Object3D()
         {
             Exists = true;
@@ -69,6 +74,7 @@ namespace SKraft
 
         public virtual void Draw(bool last)
         {
+            /*
             if (this.Exists && !this.IsInInventory)
             {
                 BoundingFrustum viewFrustum = new BoundingFrustum(Camera.ActiveCamera.View * Camera.ActiveCamera.Projection);
@@ -105,6 +111,9 @@ namespace SKraft
                     }
                 }
             }
+             * */
+
+
         }
 
         public virtual void Update()
