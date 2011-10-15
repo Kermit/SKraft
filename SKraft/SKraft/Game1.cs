@@ -20,7 +20,8 @@ namespace SKraft
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        List<Cube> cubes = new List<Cube>();
+        List<Object3D> objects3D = new List<Object3D>();
+        FpsCounter fpsCounter = new FpsCounter();
 
         public Game1()
         {
@@ -41,13 +42,22 @@ namespace SKraft
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            for (int x = 0; x < 20; ++x)
+            for (int x = 0; x < 50; ++x)
             {
-                for (int z = 0; z < 20; ++z)
+                for (int z = 0; z < 50; ++z)
                 {
-                    cubes.Add(new SampleCube(new Vector3(x, 0, z)));
+                    objects3D.Add(new SampleCube(new Vector3(x, 0, z)));
                 }
             }
+
+            for (int z = 10; z < 30; ++z)
+            {
+                for (int y = 0; y < 5; ++y)
+                {
+                    objects3D.Add(new SampleCube(new Vector3(10, y, z)));
+                }
+            }
+
             base.Initialize();
         }
 
@@ -60,7 +70,7 @@ namespace SKraft
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            foreach (Cube cube in cubes)
+            foreach (Cube cube in objects3D)
             {
                 cube.LoadContent(Content);
             }
@@ -83,7 +93,6 @@ namespace SKraft
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
@@ -102,10 +111,12 @@ namespace SKraft
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            foreach (Cube cube in cubes)
+            for (int i = 0; i < objects3D.Count; ++i)
             {
-                cube.Draw();
+                objects3D[i].Draw();
             }
+
+            this.Window.Title = "FPS: " + fpsCounter.Update(gameTime);
 
             base.Draw(gameTime);
         }

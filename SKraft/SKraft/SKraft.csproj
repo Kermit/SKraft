@@ -112,6 +112,7 @@
     <Compile Include="Cameras\FreeCamera.cs" />
     <Compile Include="Cubes\Cube.cs" />
     <Compile Include="Cubes\SampleCube.cs" />
+    <Compile Include="FpsCounter.cs" />
     <Compile Include="Object3D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

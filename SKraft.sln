@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SKraft", "SKraft\SKraft\SKraft.csproj", "{A8E42E08-6D4A-4208-8AE8-CA0F2CC79FAB}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "SKraftContent", "SKraft\SKraftContent\SKraftContent.contentproj", "{022805D4-D475-4AC8-BC39-19642F586E97}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SKraftContent", "SKraft\SKraftContent\SKraftContent.contentproj", "{022805D4-D475-4AC8-BC39-19642F586E97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

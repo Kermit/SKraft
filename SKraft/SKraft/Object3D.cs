@@ -71,27 +71,33 @@ namespace SKraft
         {
             if (this.Exists && !this.IsInInventory)
             {
-                Matrix[] transforms = new Matrix[model.Bones.Count];
-                model.CopyAbsoluteBoneTransformsTo(transforms);
+                BoundingFrustum viewFrustum = new BoundingFrustum(Camera.ActiveCamera.View * Camera.ActiveCamera.Projection);
+                BoundingSphere sourceSphere = new BoundingSphere(position, model.Meshes[0].BoundingSphere.Radius);
 
-                foreach (ModelMesh mesh in model.Meshes)
+                if (viewFrustum.Intersects(sourceSphere))
                 {
-                    foreach (BasicEffect effect in mesh.Effects)
+                    Matrix[] transforms = new Matrix[model.Bones.Count];
+                    model.CopyAbsoluteBoneTransformsTo(transforms);
+                    
+                    foreach (ModelMesh mesh in model.Meshes)
                     {
-                        if (texture != null)
+                        foreach (BasicEffect effect in mesh.Effects)
                         {
-                            effect.Texture = texture;
+                            if (texture != null)
+                            {
+                                effect.Texture = texture;
+                            }
+
+                            effect.EnableDefaultLighting();
+                            effect.World = transforms[mesh.ParentBone.Index]*
+                                           //Matrix.CreateRotationY(modelRotation)
+                                           Matrix.CreateTranslation(position);
+                            effect.View = Camera.ActiveCamera.View;
+                            effect.Projection = Camera.ActiveCamera.Projection;
                         }
 
-                        effect.EnableDefaultLighting();
-                        effect.World = transforms[mesh.ParentBone.Index]*
-                                       //Matrix.CreateRotationY(modelRotation)
-                                       Matrix.CreateTranslation(position);
-                        effect.View = Camera.ActiveCamera.View;
-                        effect.Projection = Camera.ActiveCamera.Projection;
+                        mesh.Draw();
                     }
-
-                    mesh.Draw();
                 }
             }
         }
