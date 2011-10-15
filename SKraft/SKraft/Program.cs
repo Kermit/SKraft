@@ -10,7 +10,7 @@ namespace SKraft
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (SKraft game = new SKraft())
             {
                 game.Run();
             }
