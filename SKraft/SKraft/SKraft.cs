@@ -16,14 +16,14 @@ namespace SKraft
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class SKraft : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         List<Object3D> objects3D = new List<Object3D>();
         FpsCounter fpsCounter = new FpsCounter();
 
-        public Game1()
+        public SKraft()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1440;
