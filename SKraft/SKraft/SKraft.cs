@@ -66,9 +66,9 @@ namespace SKraft
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            for (int x = 0; x < 128; ++x)
+            for (int x = 0; x < 200; ++x)
             {
-                for (int z = 0; z < 128; ++z)
+                for (int z = 0; z < 200; ++z)
                 {
                     instances.Add(new SampleCube(new Vector3(x, 0, z)));
                 }
