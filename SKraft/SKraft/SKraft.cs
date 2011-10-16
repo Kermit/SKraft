@@ -22,6 +22,7 @@ namespace SKraft
         SpriteBatch spriteBatch;
         List<Object3D> objects3D = new List<Object3D>();
         FpsCounter fpsCounter = new FpsCounter();
+        private PrimitiveCube p;
 
         public SKraft()
         {
@@ -58,6 +59,7 @@ namespace SKraft
                 }
             }
 
+            p = new PrimitiveCube(graphics);
             base.Initialize();
         }
 
@@ -70,10 +72,7 @@ namespace SKraft
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            foreach (Cube cube in objects3D)
-            {
-                cube.LoadContent(Content);
-            }
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -111,12 +110,16 @@ namespace SKraft
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            for (int i = 0; i < objects3D.Count; ++i)
+            /*for (int i = 0; i < objects3D.Count; ++i)
             {
                 objects3D[i].Draw(i == objects3D.Count - 1);
-            }
+            }*/
+
+            p.Draw(graphics);
 
             this.Window.Title = "FPS: " + fpsCounter.Update(gameTime);
+
+            
 
             base.Draw(gameTime);
         }

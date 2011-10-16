@@ -1,5 +1,8 @@
-Content\Models\cube.xnb
-Content\Models\texture.xnb
-Content\Textures\texture2.xnb
-Content\Models\texture_0.xnb
-Content\Textures\texture2low.xnb
+cube.xnb
+Cats.xnb
+texture.xnb
+texture2.xnb
+texture2low.xnb
+InstancedModel.xnb
+texture_0.xnb
+cat_0.xnb
