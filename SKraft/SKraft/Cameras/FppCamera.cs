@@ -16,109 +16,82 @@ namespace SKraft.Cameras
         private Game game;
         private Vector3 position;
         private Vector3 target;
-        private Vector2 mousePos;
 
-        public FppCamera(Game _game, Vector3 position, Vector3 target, Vector3 up) : base(_game, position, target, up)
+        public FppCamera(Game game, Vector3 position, Vector3 target, Vector3 up) : base(game, position, target, up)
         {
             this.position = position;
             this.target = target;
 
-            game = _game;
+            this.game = game;
 
-            mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Speed = 0.1f;
-            MouseSpeed = 10;
+            MouseSpeed = 5;
         }
 
         public override void Initialize()
         {
-            target.X += (Mouse.GetState().X - mousePos.X) * MouseSpeed / 1000;
-            target.Y += (Mouse.GetState().Y - mousePos.Y) * MouseSpeed / 1000;
-            mousePos.X = Mouse.GetState().X;
-            mousePos.Y = Mouse.GetState().Y;
+            target.X += (Mouse.GetState().X - game.GraphicsDevice.Viewport.Width / 2) * MouseSpeed / 1000;
+            target.Y += (Mouse.GetState().Y - game.GraphicsDevice.Viewport.Height / 2) * MouseSpeed / 1000;
 
             base.Initialize();
         }
 
         public override void Update(GameTime gameTime)
         {
-            target.X += (Mouse.GetState().X - mousePos.X) * MouseSpeed / 1000;
-            target.Y += (Mouse.GetState().Y - mousePos.Y) * MouseSpeed / 1000;
-
-            if (MathHelper.ToDegrees(target.Y) > 90)
-            {
-                target.Y = MathHelper.ToRadians(90);
-            }
-            else if (MathHelper.ToDegrees(target.Y) < -90)
-            {
-                target.Y = MathHelper.ToRadians(-90);
-            }
-
-            mousePos.X = Mouse.GetState().X;
-            mousePos.Y = Mouse.GetState().Y;
-
             if (game.IsActive)
             {
-                if (mousePos.X <= 0)
+                target.X += (Mouse.GetState().X - game.GraphicsDevice.Viewport.Width / 2) * MouseSpeed / 1000;
+                target.Y += (Mouse.GetState().Y - game.GraphicsDevice.Viewport.Height / 2) * MouseSpeed / 1000;
+
+                if (MathHelper.ToDegrees(target.Y) > 90)
                 {
-                    mousePos.X = game.GraphicsDevice.Viewport.Width;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                    target.Y = MathHelper.ToRadians(90);
                 }
-                else if (mousePos.X >= game.GraphicsDevice.Viewport.Width)
+                else if (MathHelper.ToDegrees(target.Y) < -90)
                 {
-                    mousePos.X = 0;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                    target.Y = MathHelper.ToRadians(-90);
                 }
 
-                if (mousePos.Y <= 0)
+                Mouse.SetPosition(game.GraphicsDevice.Viewport.Width / 2, game.GraphicsDevice.Viewport.Height / 2);
+
+                Matrix forwardMovement = Matrix.CreateRotationY(target.X);
+                KeyboardState state = Keyboard.GetState();
+                if (state.IsKeyDown(Keys.W))
                 {
-                    mousePos.Y = 0;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                    Vector3 v = new Vector3(0, 0, Speed);
+                    v = Vector3.Transform(v, forwardMovement);
+                    position.Z -= v.Z;
+                    position.X += v.X;
                 }
-                else if (mousePos.Y >= game.GraphicsDevice.Viewport.Height)
+
+                if (state.IsKeyDown(Keys.S))
                 {
-                    mousePos.Y = game.GraphicsDevice.Viewport.Height;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
+                    Vector3 v = new Vector3(0, 0, -Speed);
+                    v = Vector3.Transform(v, forwardMovement);
+                    position.Z -= v.Z;
+                    position.X += v.X;
                 }
+
+                if (state.IsKeyDown(Keys.A))
+                {
+                    Vector3 v = new Vector3(-Speed, 0, 0);
+                    v = Vector3.Transform(v, forwardMovement);
+                    position.Z -= v.Z;
+                    position.X += v.X;
+                }
+
+                if (state.IsKeyDown(Keys.D))
+                {
+                    Vector3 v = new Vector3(Speed, 0, 0);
+                    v = Vector3.Transform(v, forwardMovement);
+                    position.Z -= v.Z;
+                    position.X += v.X;
+                }
+
+
+                View = Matrix.CreateTranslation(-position);
+                View *= Matrix.CreateRotationY(target.X) * Matrix.CreateRotationX(target.Y);
             }
-
-            Matrix forwardMovement = Matrix.CreateRotationY(target.X);
-            KeyboardState state = Keyboard.GetState();
-            if (state.IsKeyDown(Keys.W))
-            {
-                Vector3 v = new Vector3(0, 0, Speed);
-                v = Vector3.Transform(v, forwardMovement);
-                position.Z -= v.Z;
-                position.X += v.X;
-            }
-
-            if (state.IsKeyDown(Keys.S))
-            {
-                Vector3 v = new Vector3(0, 0, -Speed);
-                v = Vector3.Transform(v, forwardMovement);
-                position.Z -= v.Z;
-                position.X += v.X;
-            }
-
-            if (state.IsKeyDown(Keys.A))
-            {
-                Vector3 v = new Vector3(-Speed, 0, 0);
-                v = Vector3.Transform(v, forwardMovement);
-                position.Z -= v.Z;
-                position.X += v.X;
-            }
-
-            if (state.IsKeyDown(Keys.D))
-            {
-                Vector3 v = new Vector3(Speed, 0, 0);
-                v = Vector3.Transform(v, forwardMovement);
-                position.Z -= v.Z;
-                position.X += v.X;
-            }
-
-
-            View = Matrix.CreateTranslation(-position);
-            View *= Matrix.CreateRotationY(target.X) * Matrix.CreateRotationX(target.Y);
 
             base.Update(gameTime);
         }
