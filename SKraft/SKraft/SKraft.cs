@@ -21,8 +21,8 @@ namespace SKraft
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         private Player player;
-
-        List<Object3D> objects3D = new List<Object3D>();
+        private Map map;
+        
         FpsCounter fpsCounter = new FpsCounter();
         private Texture2D crosshair;
 
@@ -34,7 +34,8 @@ namespace SKraft
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
            
-            player = new Player(this, new Vector3(9, 1, 9));                   
+            player = new Player(this, new Vector3(9, 1, 9));
+            map = new Map();     
             Components.Add(new Debug(this));
         }
 
@@ -46,21 +47,7 @@ namespace SKraft
         /// </summary>
         protected override void Initialize()
         {
-            for (int x = 0; x < 50; ++x)
-            {
-                for (int z = 0; z < 30; ++z)
-                {
-                    objects3D.Add(new SampleCube(new Vector3(x, 0, z)));
-                }
-            }
-
-            for (int z = 10; z < 30; ++z)
-            {
-                for (int y = 0; y < 5; ++y)
-                {
-                    objects3D.Add(new SampleCube(new Vector3(10, y, z)));
-                }
-            }
+            map.Initialize();
 
             base.Initialize();
         }
@@ -74,11 +61,8 @@ namespace SKraft
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             crosshair = Content.Load<Texture2D>("crosshair");
-
-            foreach (Cube cube in objects3D)
-            {
-                cube.LoadContent(Content);
-            }
+            map.LoadContent(Content);
+            
             player.LoadContent();
             // TODO: use this.Content to load your game content here
         }
@@ -108,7 +92,7 @@ namespace SKraft
             }
 
             player.Update(gameTime);
-            player.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
+            //player.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
             base.Update(gameTime);                        
         }
 
@@ -122,11 +106,7 @@ namespace SKraft
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             Debug.Start("drawing");
-            for (int i = 0; i < objects3D.Count; ++i)
-            {
-                objects3D[i].Draw();
-            }
-            //player.Draw();
+            map.Draw();
             Debug.Stop("drawing");
 
             spriteBatch.Begin();
