@@ -45,7 +45,7 @@
     <Compile Include="Models\cube.fbx">
       <Name>cube</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>SKraftPipeline</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +75,19 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\SKraftShader.fx">
+      <Name>SKraftShader</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SKraftPipeline\SkraftPipeline.csproj">
+      <Project>{FF69FD90-8834-4F60-ADA5-36387F112437}</Project>
+      <Name>SkraftPipeline</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 

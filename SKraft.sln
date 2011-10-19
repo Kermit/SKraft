@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SKraft", "SKraft\SKraft\SKr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SKraftContent", "SKraft\SKraftContent\SKraftContent.contentproj", "{022805D4-D475-4AC8-BC39-19642F586E97}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkraftPipeline", "SKraft\SKraftPipeline\SkraftPipeline.csproj", "{FF69FD90-8834-4F60-ADA5-36387F112437}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -17,6 +19,10 @@ Global
 		{A8E42E08-6D4A-4208-8AE8-CA0F2CC79FAB}.Release|x86.Build.0 = Release|x86
 		{022805D4-D475-4AC8-BC39-19642F586E97}.Debug|x86.ActiveCfg = Debug|x86
 		{022805D4-D475-4AC8-BC39-19642F586E97}.Release|x86.ActiveCfg = Release|x86
+		{FF69FD90-8834-4F60-ADA5-36387F112437}.Debug|x86.ActiveCfg = Debug|x86
+		{FF69FD90-8834-4F60-ADA5-36387F112437}.Debug|x86.Build.0 = Debug|x86
+		{FF69FD90-8834-4F60-ADA5-36387F112437}.Release|x86.ActiveCfg = Debug|x86
+		{FF69FD90-8834-4F60-ADA5-36387F112437}.Release|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
