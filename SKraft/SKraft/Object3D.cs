@@ -67,7 +67,7 @@ namespace SKraft
             }
         }
 
-        public virtual void Draw(bool last)
+        public virtual bool Draw(bool last)
         {
             if (this.Exists && !this.IsInInventory)
             {
@@ -103,8 +103,11 @@ namespace SKraft
 
                         mesh.Draw();
                     }
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public virtual void Update()
