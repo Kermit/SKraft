@@ -114,6 +114,7 @@
     <Compile Include="Cubes\SampleCube.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="FpsCounter.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="Object3D.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
