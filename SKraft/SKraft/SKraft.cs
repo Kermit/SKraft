@@ -20,6 +20,8 @@ namespace SKraft
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        private Player player;
+
         List<Object3D> objects3D = new List<Object3D>();
         FpsCounter fpsCounter = new FpsCounter();
         private Texture2D crosshair;
@@ -31,7 +33,9 @@ namespace SKraft
             graphics.PreferredBackBufferHeight = 900;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
-            Components.Add(new FppCamera(this, new Vector3(0, 2, 10), Vector3.Zero, Vector3.Up));
+           
+            player = new Player(this, new Vector3(9, 1, 9));            
+            Components.Add(player);         
             Components.Add(new Debug(this));
         }
 
@@ -43,8 +47,7 @@ namespace SKraft
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            for (int x = 0; x < 30; ++x)
+            for (int x = 0; x < 50; ++x)
             {
                 for (int z = 0; z < 30; ++z)
                 {
@@ -106,7 +109,6 @@ namespace SKraft
             }
 
             Camera.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
-
             base.Update(gameTime);
         }
 
