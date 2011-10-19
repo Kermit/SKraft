@@ -18,7 +18,7 @@ namespace SKraft.Cameras
         public Vector3 target { get; set; }
         private Vector2 mousePos;
 
-        public FppCamera(SKraft _game, Vector3 position, Vector3 target, Vector3 up) : base(_game, position, target, up)
+        public FppCamera(SKraft game, Vector3 position, Vector3 target, Vector3 up) : base(game, position, target, up)
         {
             this.position = position;
             this.target = target;
