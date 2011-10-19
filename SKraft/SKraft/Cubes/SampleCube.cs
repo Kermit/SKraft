@@ -31,7 +31,7 @@ namespace SKraft.Cubes
 
             if (sampleTex == null)
             {
-                sampleTex = content.Load<Texture2D>(@"textures\texture2");
+                sampleTex = content.Load<Texture2D>(@"textures\texture2low2");
             }
 
             model = cubeModel;

@@ -34,8 +34,7 @@ namespace SKraft
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
            
-            player = new Player(this, new Vector3(9, 1, 9));            
-            Components.Add(player);         
+            player = new Player(this, new Vector3(9, 1, 9));                   
             Components.Add(new Debug(this));
         }
 
@@ -74,13 +73,13 @@ namespace SKraft
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
             crosshair = Content.Load<Texture2D>("crosshair");
 
             foreach (Cube cube in objects3D)
             {
                 cube.LoadContent(Content);
             }
+            player.LoadContent();
             // TODO: use this.Content to load your game content here
         }
 
@@ -108,8 +107,9 @@ namespace SKraft
                 this.Exit();
             }
 
-            Camera.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
-            base.Update(gameTime);
+            player.Update(gameTime);
+            player.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
+            base.Update(gameTime);                        
         }
 
         /// <summary>
@@ -126,6 +126,7 @@ namespace SKraft
             {
                 objects3D[i].Draw();
             }
+            //player.Draw();
             Debug.Stop("drawing");
 
             spriteBatch.Begin();
@@ -133,8 +134,6 @@ namespace SKraft
                 new Vector2(GraphicsDevice.Viewport.Width / 2 - crosshair.Width / 2 + 5, GraphicsDevice.Viewport.Height / 2 - crosshair.Height / 2 + 5),
                 Color.White);
             spriteBatch.End();
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             this.Window.Title = "FPS: " + fpsCounter.Update(gameTime);
             Debug.AddString(String.Format("FPS: {0}", fpsCounter.Update(gameTime)));
@@ -142,6 +141,11 @@ namespace SKraft
             Debug.AddStringTimer("Drawing time", "drawing");
 
             base.Draw(gameTime);
+            /*
+            * Potrzebne poniewa¿ mieszamy 3D z 2D
+            */
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
         }
     }
 }

@@ -93,7 +93,7 @@ namespace SKraft
                                 effect.Texture = texture;
                             }
 
-                            effect.EnableDefaultLighting();
+                            //effect.EnableDefaultLighting();
                             effect.World = transforms[mesh.ParentBone.Index]*
                                            //Matrix.CreateRotationY(modelRotation)
                                            Matrix.CreateTranslation(Position);
@@ -107,10 +107,7 @@ namespace SKraft
             }
         }
 
-        public virtual void Update()
-        {
-            
-        }
+        public virtual void Update(GameTime gameTime) { }
 
         public override string ToString()
         {

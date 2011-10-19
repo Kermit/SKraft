@@ -9,8 +9,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace SKraft
 {
-    class Player : DrawableGameComponent
+    class Player : Object3D
     {
+        SKraft game;
         protected Model model;
         protected Vector3 position;
         protected Texture2D texture;
@@ -22,29 +23,28 @@ namespace SKraft
         private Vector3 target;
         private Vector2 mousePos;
 
-        public Player(SKraft game, Vector3 position) : base(game)
+        public Player(SKraft game, Vector3 position)
         {
             this.position = position;
+            this.game = game;
             fppCamera = new FppCamera(game, new Vector3(position.X, position.Y + 1, position.Z), Vector3.Zero, Vector3.Up);
 
             mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Speed = 0.1f;
             MouseSpeed = 10;
 
-            Game.Components.Add(fppCamera);
+            game.Components.Add(fppCamera);
         }
 
-        protected override void LoadContent()
+        public void LoadContent()
         {
-            model = Game.Content.Load<Model>(@"models\player");
-            texture = Game.Content.Load<Texture2D>(@"textures\texture2");
+            model = game.Content.Load<Model>(@"models\player");
+            texture = game.Content.Load<Texture2D>(@"textures\texture2");
 
             transforms = new Matrix[model.Bones.Count];           
-
-            base.LoadContent();
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             target.X += (Mouse.GetState().X - mousePos.X) * MouseSpeed / 1000;
             target.Y += (Mouse.GetState().Y - mousePos.Y) * MouseSpeed / 1000;
@@ -60,14 +60,14 @@ namespace SKraft
             mousePos.X = Mouse.GetState().X;
             mousePos.Y = Mouse.GetState().Y;
 
-            if (Game.IsActive)
+            if (game.IsActive)
             {
                 if (mousePos.X <= 0)
                 {
-                    mousePos.X = this.GraphicsDevice.Viewport.Width;
+                    mousePos.X = game.GraphicsDevice.Viewport.Width;
                     Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
                 }
-                else if (mousePos.X >= this.GraphicsDevice.Viewport.Width)
+                else if (mousePos.X >= game.GraphicsDevice.Viewport.Width)
                 {
                     mousePos.X = 0;
                     Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
@@ -78,9 +78,9 @@ namespace SKraft
                     mousePos.Y = 0;
                     Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
                 }
-                else if (mousePos.Y >= this.GraphicsDevice.Viewport.Height)
+                else if (mousePos.Y >= game.GraphicsDevice.Viewport.Height)
                 {
-                    mousePos.Y = this.GraphicsDevice.Viewport.Height;
+                    mousePos.Y = game.GraphicsDevice.Viewport.Height;
                     Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
                 }
             }
@@ -120,12 +120,10 @@ namespace SKraft
             }
 
             fppCamera.target = new Vector3(target.X, target.Y, 0);
-
-            base.Update(gameTime);
             Rotate(target.X, target.Y);
         }
 
-        public override void Draw(GameTime gameTime)
+        public void Draw(GameTime gameTime)
         {
             model.CopyAbsoluteBoneTransformsTo(transforms);
 
@@ -151,8 +149,6 @@ namespace SKraft
 
                 mesh.Draw();
             }
-
-            base.Draw(gameTime);
         }
 
         public void Move(float x, float z)
@@ -164,6 +160,58 @@ namespace SKraft
         public void Rotate(float x, float y)
         {
             model.Root.Transform = Matrix.CreateRotationY(-x);
+        }
+
+        /// <summary>
+        /// Funkcja sprawdzająca, który klocek został kliknięty.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="objects"></param>
+        /// <param name="graphics"></param>
+        public void CheckClickedModel(int x, int y, List<Object3D> objects, GraphicsDeviceManager graphics)
+        {
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+
+                Vector3 nearsource = new Vector3(x, y, 0f);
+                Vector3 farsource = new Vector3(x, y, 1f);
+
+                Vector3 nearPoint = graphics.GraphicsDevice.Viewport.Unproject(nearsource, 
+                    fppCamera.Projection, fppCamera.View,Matrix.CreateTranslation(0, 0, 0));
+                Vector3 farPoint = graphics.GraphicsDevice.Viewport.Unproject(farsource, 
+                    fppCamera.Projection, fppCamera.View, Matrix.CreateTranslation(0, 0, 0));
+
+                Vector3 direction = farPoint - nearPoint;
+                direction.Normalize();
+                Ray pickRay = new Ray(nearPoint, direction);
+
+                float selectedDistance = 2.5f;
+                int selectedIndex = -1;
+                for (int i = 0; i < objects.Count; i++)
+                {
+                    if (objects[i].Exists)
+                    {
+                        Vector3 pos = objects[i].Position;
+                        BoundingBox bounding = new BoundingBox(new Vector3(pos.X - 0.5f, pos.Y - 0.5f, pos.Z - 0.5f),
+                            new Vector3(pos.X + 0.5f, pos.Y + 0.5f, pos.Z + 0.5f));
+                        Nullable<float> result = pickRay.Intersects(bounding);
+                        if (result.HasValue)
+                        {
+                            if (result.Value < selectedDistance)
+                            {
+                                selectedIndex = i;
+                                selectedDistance = result.Value;
+                            }
+                        }
+                    }
+                }
+
+                if (selectedIndex > -1)
+                {
+                    objects[selectedIndex].Exists = false;
+                }
+            }
         }
     }
 }

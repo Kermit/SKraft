@@ -90,15 +90,22 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-<Compile Include="crosshair.png">
-  <Name>crosshair</Name>
-  <Importer>TextureImporter</Importer>
-  <Processor>TextureProcessor</Processor>
-</Compile>
+    <Compile Include="crosshair.png">
+      <Name>crosshair</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
     <Compile Include="Models\player.fbx">
       <Name>player</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\texture2low2.png">
+      <Name>texture2low2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

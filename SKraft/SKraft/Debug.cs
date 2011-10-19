@@ -85,12 +85,6 @@ namespace SKraft
                 }
                 spriteBatch.End();
                 stringList.Clear();
-
-                /*
-                * Potrzebne poniewa¿ mieszamy 3D z 2D
-                */
-                GraphicsDevice.BlendState = BlendState.Opaque;
-                GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             }
 
             base.Draw(gameTime);
