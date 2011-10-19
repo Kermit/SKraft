@@ -9,12 +9,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace SKraft
 {
-    class Player : Object3D
+    public class Player : Object3D
     {
-        SKraft game;
-        protected Model model;
-        protected Vector3 position;
-        protected Texture2D texture;
+        private SKraft game;
         private Matrix[] transforms;
         private FppCamera fppCamera;
 
@@ -25,7 +22,7 @@ namespace SKraft
 
         public Player(SKraft game, Vector3 position)
         {
-            this.position = position;
+            this.Position = position;
             this.game = game;
             fppCamera = new FppCamera(game, new Vector3(position.X, position.Y + 1, position.Z), Vector3.Zero, Vector3.Up);
 
@@ -39,12 +36,11 @@ namespace SKraft
         public void LoadContent()
         {
             model = game.Content.Load<Model>(@"models\player");
-            texture = game.Content.Load<Texture2D>(@"textures\texture2");
 
             transforms = new Matrix[model.Bones.Count];           
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             target.X += (Mouse.GetState().X - mousePos.X) * MouseSpeed / 1000;
             target.Y += (Mouse.GetState().Y - mousePos.Y) * MouseSpeed / 1000;
@@ -142,7 +138,7 @@ namespace SKraft
                     }
 
                     effect.EnableDefaultLighting();
-                    effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateTranslation(position);
+                    effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateTranslation(Position);
                     effect.View = Camera.ActiveCamera.View;
                     effect.Projection = Camera.ActiveCamera.Projection;
                 }
@@ -153,8 +149,7 @@ namespace SKraft
 
         public void Move(float x, float z)
         {
-            position.Z -= z;
-            position.X += x;
+            Position = new Vector3(Position.X + x, 0, Position.Z - z);
         }
 
         public void Rotate(float x, float y)
