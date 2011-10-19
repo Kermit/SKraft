@@ -45,7 +45,7 @@
     <Compile Include="Models\cube.fbx">
       <Name>cube</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>SKraftPipeline</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>

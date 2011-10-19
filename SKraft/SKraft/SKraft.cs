@@ -35,7 +35,7 @@ namespace SKraft
             Content.RootDirectory = "Content";
            
             player = new Player(this, new Vector3(9, 1, 9));
-            map = new Map();     
+            map = new Map(Content);     
             Components.Add(new Debug(this));
         }
 
@@ -61,7 +61,7 @@ namespace SKraft
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             crosshair = Content.Load<Texture2D>("crosshair");
-            map.LoadContent(Content);
+            map.LoadContent();
             
             player.LoadContent();
             // TODO: use this.Content to load your game content here
@@ -106,7 +106,7 @@ namespace SKraft
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             Debug.Start("drawing");
-            map.Draw();
+            map.Draw(GraphicsDevice);
             Debug.Stop("drawing");
 
             spriteBatch.Begin();
