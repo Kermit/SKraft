@@ -32,6 +32,7 @@ namespace SKraft
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
             Components.Add(new FppCamera(this, new Vector3(0, 2, 10), Vector3.Zero, Vector3.Up));
+            Components.Add(new Debug(this));
         }
 
         /// <summary>
@@ -115,12 +116,15 @@ namespace SKraft
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            int drawCalls = 0;
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            Debug.Start("drawing");
             for (int i = 0; i < objects3D.Count; ++i)
             {
                 objects3D[i].Draw();
             }
+            Debug.Stop("drawing");
 
             spriteBatch.Begin();
             spriteBatch.Draw(crosshair,
@@ -131,6 +135,9 @@ namespace SKraft
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             this.Window.Title = "FPS: " + fpsCounter.Update(gameTime);
+            Debug.AddString(String.Format("FPS: {0}", fpsCounter.Update(gameTime)));
+            Debug.AddString(String.Format("Draw calls: {0}", drawCalls));
+            Debug.AddStringTimer("Drawing time", "drawing");
 
             base.Draw(gameTime);
         }

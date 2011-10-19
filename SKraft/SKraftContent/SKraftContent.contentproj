@@ -70,6 +70,26 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DejavuSans.spritefont">
+      <Name>DejavuSans</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\SKraftShader.fx">
+      <Name>SKraftShader</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SKraftPipeline\SkraftPipeline.csproj">
+      <Project>{FF69FD90-8834-4F60-ADA5-36387F112437}</Project>
+      <Name>SkraftPipeline</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="crosshair.png">
       <Name>crosshair</Name>
       <Importer>TextureImporter</Importer>
