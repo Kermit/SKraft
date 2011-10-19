@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace SKraft.Cubes
 {
-    abstract class Cube : Object3D
+    public abstract class Cube : Object3D
     {
         public struct Bonus
         {

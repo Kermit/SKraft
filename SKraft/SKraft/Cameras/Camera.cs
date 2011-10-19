@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -29,6 +30,56 @@ namespace SKraft.Cameras
             if (ActiveCamera == null)
             {
                 ActiveCamera = this;
+            }
+        }
+
+        
+
+        //Przeniesc docelowo do gracza
+        public static void CheckClickedModel(int x, int y, List<Object3D> objects, GraphicsDeviceManager graphics)
+        {
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+
+                Vector3 nearsource = new Vector3(x, y, 0f);
+                Vector3 farsource = new Vector3(x, y, 1f);
+
+                Vector3 nearPoint = graphics.GraphicsDevice.Viewport.Unproject(nearsource, ActiveCamera.Projection,
+                                                                               ActiveCamera.View,
+                                                                               Matrix.CreateTranslation(0, 0, 0));
+                Vector3 farPoint = graphics.GraphicsDevice.Viewport.Unproject(farsource, ActiveCamera.Projection,
+                                                                              ActiveCamera.View,
+                                                                              Matrix.CreateTranslation(0, 0, 0));
+
+                Vector3 direction = farPoint - nearPoint;
+                direction.Normalize();
+                Ray pickRay = new Ray(nearPoint, direction);
+
+                float selectedDistance = 2.5f;
+                int selectedIndex = -1;
+                for (int i = 0; i < objects.Count; i++)
+                {
+                    if (objects[i].Exists)
+                    {
+                        Vector3 pos = objects[i].Position;
+                        BoundingBox bounding = new BoundingBox(new Vector3(pos.X - 0.5f, pos.Y - 0.5f, pos.Z - 0.5f), 
+                            new Vector3(pos.X + 0.5f, pos.Y + 0.5f, pos.Z + 0.5f));
+                        Nullable<float> result = pickRay.Intersects(bounding);
+                        if (result.HasValue)
+                        {
+                            if (result.Value < selectedDistance)
+                            {
+                                selectedIndex = i;
+                                selectedDistance = result.Value;
+                            }
+                        }
+                    }
+                }
+
+                if (selectedIndex > -1)
+                {
+                    objects[selectedIndex].Exists = false;
+                }
             }
         }
     }

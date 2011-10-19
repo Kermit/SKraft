@@ -9,13 +9,13 @@ using SKraft.Cubes;
 
 namespace SKraft
 {
-    abstract class Object3D
+    public abstract class Object3D
     {
         protected short life;
         protected string name;
         protected Texture2D icon;
-        protected Model model;
-        protected Vector3 position;
+        public Model model; //zabezpieczyc
+        public Vector3 Position { get; protected set; }
         protected Texture2D texture;
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace SKraft
         /// </summary>
         public bool Loot { get; protected set; }
 
-        public bool Exists { get; protected set; }
+        public bool Exists { get; set; }
 
         protected Object3D()
         {
@@ -67,12 +67,12 @@ namespace SKraft
             }
         }
 
-        public virtual void Draw(bool last)
+        public virtual void Draw()
         {
             if (this.Exists && !this.IsInInventory)
             {
                 BoundingFrustum viewFrustum = new BoundingFrustum(Camera.ActiveCamera.View * Camera.ActiveCamera.Projection);
-                BoundingSphere sourceSphere = new BoundingSphere(position, model.Meshes[0].BoundingSphere.Radius);
+                BoundingSphere sourceSphere = new BoundingSphere(Position, model.Meshes[0].BoundingSphere.Radius);
 
                 if (viewFrustum.Intersects(sourceSphere))
                 {
@@ -96,7 +96,7 @@ namespace SKraft
                             effect.EnableDefaultLighting();
                             effect.World = transforms[mesh.ParentBone.Index]*
                                            //Matrix.CreateRotationY(modelRotation)
-                                           Matrix.CreateTranslation(position);
+                                           Matrix.CreateTranslation(Position);
                             effect.View = Camera.ActiveCamera.View;
                             effect.Projection = Camera.ActiveCamera.Projection;
                         }

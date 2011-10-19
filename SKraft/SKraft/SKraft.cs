@@ -22,6 +22,7 @@ namespace SKraft
         SpriteBatch spriteBatch;
         List<Object3D> objects3D = new List<Object3D>();
         FpsCounter fpsCounter = new FpsCounter();
+        private Texture2D crosshair;
 
         public SKraft()
         {
@@ -42,9 +43,9 @@ namespace SKraft
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            for (int x = 0; x < 50; ++x)
+            for (int x = 0; x < 30; ++x)
             {
-                for (int z = 0; z < 50; ++z)
+                for (int z = 0; z < 30; ++z)
                 {
                     objects3D.Add(new SampleCube(new Vector3(x, 0, z)));
                 }
@@ -69,6 +70,8 @@ namespace SKraft
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            crosshair = Content.Load<Texture2D>("crosshair");
 
             foreach (Cube cube in objects3D)
             {
@@ -100,6 +103,9 @@ namespace SKraft
             {
                 this.Exit();
             }
+
+            Camera.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
+
             base.Update(gameTime);
         }
 
@@ -113,8 +119,16 @@ namespace SKraft
 
             for (int i = 0; i < objects3D.Count; ++i)
             {
-                objects3D[i].Draw(i == objects3D.Count - 1);
+                objects3D[i].Draw();
             }
+
+            spriteBatch.Begin();
+            spriteBatch.Draw(crosshair,
+                new Vector2(GraphicsDevice.Viewport.Width / 2 - crosshair.Width / 2 + 5, GraphicsDevice.Viewport.Height / 2 - crosshair.Height / 2 + 5),
+                Color.White);
+            spriteBatch.End();
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             this.Window.Title = "FPS: " + fpsCounter.Update(gameTime);
 
