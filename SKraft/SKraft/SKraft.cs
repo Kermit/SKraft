@@ -36,7 +36,7 @@ namespace SKraft
             Content.RootDirectory = "Content";
            
             player = new Player(this, new Vector3(9, 1, 9));
-            map = new Map();     
+            map = new Map(player);     
             Components.Add(new Debug(this));
         }
 
@@ -93,7 +93,10 @@ namespace SKraft
             }
             
             player.Update(gameTime);
-            map.Update(player);
+            if (!gameTime.IsRunningSlowly)
+            {
+                map.Update();
+            }
             //player.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
             base.Update(gameTime);                        
         }
