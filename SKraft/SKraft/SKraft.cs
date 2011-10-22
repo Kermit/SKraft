@@ -93,7 +93,7 @@ namespace SKraft
             }
             
             player.Update(gameTime);
-            if (!gameTime.IsRunningSlowly)
+            //if (!gameTime.IsRunningSlowly)
             {
                 map.Update();
             }

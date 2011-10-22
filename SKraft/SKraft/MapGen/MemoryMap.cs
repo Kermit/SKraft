@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using SKraft.Cubes;
+using System.IO;
 
 namespace SKraft.MapGen
 {
@@ -12,9 +14,11 @@ namespace SKraft.MapGen
     {
         private class Sector
         {
-            internal const byte SizeX = 100;
-            internal const byte SizeY = 200;
-            internal const byte SizeZ = 100;
+            internal const int SizeX = 300;
+            internal const int SizeY = 200;
+            internal const int SizeZ = 300;
+            private const string Path = "\\Maps\\";
+            private bool isExist = true;
 
             internal byte[, ,] bytes = new byte[SizeX, SizeY, SizeZ];
 
@@ -29,50 +33,147 @@ namespace SKraft.MapGen
             /// <returns></returns>
             internal Cube[] GetCubes(int fromX, int fromY, int fromZ, int toX, int toY, int toZ, int multipierX, int multipierZ)
             {
-                if (toX == 0 || toX > SizeX)
-                {
-                    toX = SizeX;
-                }
-                if (toY == 0 || toY > SizeY)
-                {
-                    toY = SizeY;
-                }
-                if (toZ == 0 || toZ > SizeZ)
-                {
-                    toZ = SizeZ;
-                }
-
-                if (fromX < 0)
-                {
-                    fromX = 0;
-                }
-                if (fromY < 0)
-                {
-                    fromY = 0;
-                }
-                if (fromZ < 0)
-                {
-                    fromZ = 0;
-                }
-
                 List<Cube> cubes = new List<Cube>();
-                for (int x = fromX; x < toX; ++x)
+
+                if (isExist)
                 {
-                    for (int y = fromY; y < toY; ++y)
+                    if (toX == 0 || toX > SizeX)
                     {
-                        for (int z = fromZ; z < toZ; ++z)
+                        toX = SizeX;
+                    }
+                    if (toY == 0 || toY > SizeY)
+                    {
+                        toY = SizeY;
+                    }
+                    if (toZ == 0 || toZ > SizeZ)
+                    {
+                        toZ = SizeZ;
+                    }
+
+                    if (fromX < 0)
+                    {
+                        fromX = 0;
+                    }
+                    if (fromY < 0)
+                    {
+                        fromY = 0;
+                    }
+                    if (fromZ < 0)
+                    {
+                        fromZ = 0;
+                    }
+
+                    for (int x = fromX; x < toX; ++x)
+                    {
+                        for (int y = fromY; y < toY; ++y)
                         {
-                            switch (bytes[x, y, z])
+                            for (int z = fromZ; z < toZ; ++z)
                             {
-                                case 1:
-                                    cubes.Add(new SampleCube(new Vector3((multipierX * SizeX) + x, y, (multipierZ * SizeZ) + z)));
-                                    break;
+                                switch (bytes[x, y, z])
+                                {
+                                    case 1:
+                                        cubes.Add(new SampleCube(new Vector3((multipierX*SizeX) + x, y, (multipierZ*SizeZ) + z)));
+                                        break;
+                                }
                             }
                         }
                     }
                 }
-
                 return cubes.ToArray();
+            }
+
+            public void SaveSector(string mapName, int sectorX, int sectorY)
+            {
+                BinaryWriter bw = null;
+                try
+                {
+                    if (!Directory.Exists(System.Environment.CurrentDirectory + Path + mapName + "\\"))
+                    {
+                        Directory.CreateDirectory(System.Environment.CurrentDirectory + Path + mapName + "\\");
+                    }
+
+                    bw = new BinaryWriter(new FileStream(System.Environment.CurrentDirectory + Path + mapName + "\\" + sectorX + sectorY + ".sec", FileMode.Create));
+
+                    for (int x = 0; x < SizeX; ++x)
+                    {
+                        for (int y = 0; y < SizeY; ++y)
+                        {
+                            for (int z = 0; z < SizeZ; ++z)
+                            {
+                                bw.Write(bytes[x, y, z]);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    bw.Flush();
+                    bw.Close();
+                }
+            }
+
+            private void LoadSector(object args)
+            {
+                object[] argsArray = (object[])args;
+                string mapName = (string)argsArray[0];
+                int sectorX = (int)argsArray[1];
+                int sectorY = (int)argsArray[2];
+
+                for (int i = 0; i < 5; ++i) //5-ciokrotna próba wczytania pliku
+                {
+                    BinaryReader br = null;
+                    try
+                    {
+                        if (!Directory.Exists(System.Environment.CurrentDirectory + Path + mapName + "\\"))
+                        {
+                            Directory.CreateDirectory(System.Environment.CurrentDirectory + Path + mapName + "\\");
+                        }
+
+                        if (!File.Exists(System.Environment.CurrentDirectory + Path + mapName + "\\" + sectorX + sectorY + ".sec"))
+                        {
+                            isExist = false;
+                            return;
+                        }
+
+                        br = new BinaryReader(new FileStream(System.Environment.CurrentDirectory + Path + mapName + "\\" + sectorX + sectorY +
+                                    ".sec", FileMode.Open));
+
+                        for (int x = 0; x < SizeX; ++x)
+                        {
+                            for (int y = 0; y < SizeY; ++y)
+                            {
+                                for (int z = 0; z < SizeZ; ++z)
+                                {
+                                    bytes[x, y, z] = br.ReadByte();
+                                }
+                            }
+                        }
+
+                        i = 5;
+                    }
+                    catch (Exception)
+                    {
+                        Thread.Sleep(50);
+                    }
+                    finally
+                    {
+                        if (br != null)
+                        {
+                            br.Close();
+                        }
+                    }
+                }
+            }
+
+            public void LoadSectorThread(string mapName, int sectorX, int sectorY)
+            {
+                object[] argsArray = new object[] { mapName, sectorX, sectorY };
+                object args = argsArray;
+
+                Thread thread = new Thread(LoadSector);
+                thread.IsBackground = true;
+                thread.Priority = ThreadPriority.Lowest;
+                thread.Start(args);
             }
         }
 
@@ -91,9 +192,15 @@ namespace SKraft.MapGen
             {
                 for (int z = 0; z < SectorSize.Z; ++z)
                 {
+                    if (x == (int)(SectorSize.X / 2) && z == (int)(SectorSize.Z / 2))
+                    {
+                        continue;
+                    }
                     sectors[0].bytes[x, 0, z] = 1;
                 }
             }
+
+            sectors[0].SaveSector("Test", 0, 0);
 
             for (int i = 1; i < sectors.Length; ++i)
             {
@@ -207,6 +314,19 @@ namespace SKraft.MapGen
                                                            (int) currentSector.X + 1, (int) currentSector.Y + 1));
                     }
                 }
+
+                if (posInSector.Y < cubesLength)
+                {
+                    if (sectors[2] != null)
+                    {
+                        //gracz w lewym prawym górnym rogu sektora
+                        cubes.AddRange(sectors[2].GetCubes(0, 0, Sector.SizeZ - (cubesLength - (int)posInSector.Y),
+                                                          cubesLength - Sector.SizeX + (int)posInSector.X + 1,
+                                                          Sector.SizeY,
+                                                          0,
+                                                          (int)currentSector.X + 1, (int)currentSector.Y - 1));
+                    }
+                }
             }
 
             if (sectors[7] != null)
@@ -219,6 +339,19 @@ namespace SKraft.MapGen
                                                        Sector.SizeY,
                                                        cubesLength - Sector.SizeZ + (int) posInSector.Y + 1,
                                                        (int) currentSector.X, (int) currentSector.Y + 1));
+
+                    if (posInSector.X < cubesLength)
+                    {
+                        if (sectors[6] != null)
+                        {
+                            //gracz w lewym dolnym rogu sektora
+                            cubes.AddRange(sectors[6].GetCubes(Sector.SizeX - (cubesLength - (int)posInSector.X), 0, 0,
+                                                                0,
+                                                                Sector.SizeY,
+                                                                cubesLength - Sector.SizeZ + (int)posInSector.Y + 1,
+                                                                (int)currentSector.X - 1, (int)currentSector.Y + 1));
+                        }
+                    }
                 }
             }
 
@@ -237,7 +370,7 @@ namespace SKraft.MapGen
                 {
                     if (posInSector.Y < cubesLength)
                     {
-                        //gracz w lewym dolnym rogu sektora
+                        //gracz w lewym górnym rogu sektora
                         cubes.AddRange(sectors[0].GetCubes(Sector.SizeX - cubesLength + (int) posInSector.X, 0,
                                                            Sector.SizeZ - cubesLength + (int) posInSector.Y,
                                                            0,
@@ -277,9 +410,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[5];
                     sectors[7] = sectors[8];
 
-                    sectors[2] = null;
-                    sectors[5] = null;
-                    sectors[8] = null;
+                    sectors[2].LoadSectorThread("Test", 0, 0);
+                    sectors[5].LoadSectorThread("Test", 0, 0);
+                    sectors[8].LoadSectorThread("Test", 0, 0);
                 }
                 else
                 {
@@ -291,9 +424,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[3];
                     sectors[7] = sectors[6];
 
-                    sectors[0] = null;
-                    sectors[3] = null;
-                    sectors[6] = null;
+                    sectors[0].LoadSectorThread("Test", 0, 0);
+                    sectors[3].LoadSectorThread("Test", 0, 0);
+                    sectors[6].LoadSectorThread("Test", 0, 0);
                 }
             }
             else
@@ -308,9 +441,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[7];
                     sectors[5] = sectors[8];
 
-                    sectors[6] = null;
-                    sectors[7] = null;
-                    sectors[8] = null;
+                    sectors[6].LoadSectorThread("Test", 0, 0);
+                    sectors[7].LoadSectorThread("Test", 0, 0);
+                    sectors[8].LoadSectorThread("Test", 0, 0);
                 }
                 else
                 {
@@ -322,9 +455,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[1];
                     sectors[5] = sectors[2];
 
-                    sectors[0] = null;
-                    sectors[1] = null;
-                    sectors[2] = null;
+                    sectors[0].LoadSectorThread("Test", 0, 0);
+                    sectors[1].LoadSectorThread("Test", 0, 0);
+                    sectors[2].LoadSectorThread("Test", 0, 0);
                 }
             }
         }
