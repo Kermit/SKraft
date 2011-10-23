@@ -92,6 +92,14 @@ namespace SKraft
 
         static public void AddString(String stringToAdd)
         {
+            for (int i = 0; i < stringList.Count; ++i)
+            {
+                if (stringList[i] == stringToAdd)
+                {
+                    return;
+                }
+            }
+
             stringList.Add(stringToAdd);
         }
 

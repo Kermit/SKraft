@@ -74,6 +74,7 @@ namespace SKraft.MapGen
         {
             if (cubes.Length > 0)
             {
+                Debug.AddString("Drawing cubes: " + cubes.Length);
                 Array.Resize(ref instanceTransforms, cubes.Length);
 
                 for (int i = 0; i < cubes.Length; i++)

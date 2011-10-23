@@ -24,5 +24,16 @@ namespace SKraft.Cubes
         {
             get { return bonusObjects; }
         }
+
+        public BoundingBox BBox { get; private set; }
+
+        public Cube(Vector3 position)
+        {
+            this.Position = position;
+
+            BBox = new BoundingBox(new Vector3(Position.X - 0.5f, Position.Y - 0.5f, Position.Z - 0.5f),
+                            new Vector3(Position.X + 0.5f, Position.Y + 0.5f, Position.Z + 0.5f));
+
+        }
     }
 }

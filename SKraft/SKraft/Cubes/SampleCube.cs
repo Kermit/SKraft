@@ -12,8 +12,8 @@ namespace SKraft.Cubes
     {
         private static Texture2D sampleTex;
         public SampleCube(Vector3 position)
+            : base(position)
         {
-            this.Position = position;
             this.life = 1000;
             this.name = "Sample Cube";
             this.Power = 1;
