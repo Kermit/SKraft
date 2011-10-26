@@ -33,7 +33,7 @@ namespace SKraft.MapGen
 
         public Map(Player player)
         {
-            memoryMap = new MemoryMap(player.Position);
+            memoryMap = new MemoryMap(player.Position, false);
             this.player = player;
         }
 
@@ -67,7 +67,7 @@ namespace SKraft.MapGen
 
         public void Update()
         {
-            cubes = memoryMap.GetDrawingCubes(player.Position, 10);
+            cubes = memoryMap.GetDrawingCubes(player.Position, 30);
         }
 
         public void Draw(GraphicsDevice graphicsDevice)
