@@ -19,7 +19,10 @@ namespace SKraft.MapGen
         DynamicVertexBuffer instanceVertexBuffer;
         ContentManager content;
         private MemoryMap memoryMap;
-        private Player player;
+        public bool Loading
+        {
+            get { return memoryMap.Loading; }
+        }
 
         // To store instance transform matrices in a vertex buffer, we use this custom
         // vertex type which encodes 4x4 matrices as a set of four Vector4 values.
@@ -31,10 +34,10 @@ namespace SKraft.MapGen
             new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 3)
         );
 
-        public Map(Player player)
+        public Map(Vector3 playerPos)
         {
-            memoryMap = new MemoryMap(player.Position, false);
-            this.player = player;
+            memoryMap = new MemoryMap(playerPos, false);
+            cubes = new Cube[0];
         }
 
         public void Initialize()
@@ -65,10 +68,12 @@ namespace SKraft.MapGen
             instancedModel.CopyAbsoluteBoneTransformsTo(instancedModelBones);
         }
 
-        public void Update()
+        public void Update(Vector3 position)
         {
-            cubes = memoryMap.GetDrawingCubes(player.Position, 30);
+            cubes = memoryMap.GetDrawingCubes(position, 30);
         }
+
+        //public static void 
 
         public void Draw(GraphicsDevice graphicsDevice)
         {

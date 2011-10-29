@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SKraft.Cameras;
 using Microsoft.Xna.Framework.Input;
+using SKraft.MapGen;
 
 namespace SKraft
 {
@@ -18,18 +19,21 @@ namespace SKraft
         public float Speed { get; set; }
         public float MouseSpeed { get; set; }
         private Vector3 target;
+        private Vector3 targetRemember = new Vector3(); //zapamietuje obrot, aby updetowac mape
         private Vector2 mousePos;
+        private Map map;
 
-        public Player(SKraft game, Vector3 position)
+        public Player(SKraft game, Vector3 position, Map map)
         {
             this.Position = position;
             this.game = game;
+            this.map = map;
             fppCamera = new FppCamera(game, new Vector3(position.X, position.Y + 1, position.Z), Vector3.Zero, Vector3.Up);
 
             mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Speed = 0.1f;
             MouseSpeed = 10;
-
+            
             game.Components.Add(fppCamera);
         }
 
@@ -42,6 +46,8 @@ namespace SKraft
 
         public override void Update(GameTime gameTime)
         {
+            bool mapUpdate = false;
+
             target.X += (Mouse.GetState().X - mousePos.X) * MouseSpeed / 1000;
             target.Y += (Mouse.GetState().Y - mousePos.Y) * MouseSpeed / 1000;
 
@@ -89,6 +95,7 @@ namespace SKraft
                 v = Vector3.Transform(v, forwardMovement);
                 fppCamera.Move(v.X, v.Z);
                 Move(v.X, v.Z);
+                mapUpdate = true;
             }
 
             if (state.IsKeyDown(Keys.S))
@@ -97,6 +104,7 @@ namespace SKraft
                 v = Vector3.Transform(v, forwardMovement);
                 fppCamera.Move(v.X, v.Z);
                 Move(v.X, v.Z);
+                mapUpdate = true;
             }
 
             if (state.IsKeyDown(Keys.A))
@@ -105,6 +113,7 @@ namespace SKraft
                 v = Vector3.Transform(v, forwardMovement);
                 fppCamera.Move(v.X, v.Z);
                 Move(v.X, v.Z);
+                mapUpdate = true;
             }
 
             if (state.IsKeyDown(Keys.D))
@@ -113,10 +122,27 @@ namespace SKraft
                 v = Vector3.Transform(v, forwardMovement);
                 fppCamera.Move(v.X, v.Z);
                 Move(v.X, v.Z);
+                mapUpdate = true;
+            }
+
+            if (target != targetRemember)
+            {
+                mapUpdate = true;
+                targetRemember = target;
             }
 
             fppCamera.target = new Vector3(target.X, target.Y, 0);
             Rotate(target.X, target.Y);
+
+            if (mapUpdate || map.Loading)
+            {
+                if (map.Loading)
+                {
+                    Debug.AddString("Loading");
+                }
+
+                map.Update(Position);
+            }
         }
 
         public void Draw(GameTime gameTime)

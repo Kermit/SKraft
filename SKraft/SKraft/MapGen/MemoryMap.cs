@@ -231,6 +231,7 @@ namespace SKraft.MapGen
         private Sector[] sectors = new Sector[9];
         private Vector2 currentSector = new Vector2(0, 0);
         private bool threading;
+        public bool Loading { get; private set; }
 
         /// <summary>
         /// Wielość jednego sektora
@@ -281,6 +282,8 @@ namespace SKraft.MapGen
                     }
                 }
             }
+
+            Loading = true;
         }
 
         public void LoadContent(ContentManager content)
@@ -307,11 +310,12 @@ namespace SKraft.MapGen
                 }
             }
 
+            Loading = false;
             for (int i = 0; i < sectors.Length; ++i)
             {
                 if (!sectors[i].IsLoaded)
                 {
-                    Debug.AddString("Loading");
+                    Loading = true;
                     break;
                 }
             }

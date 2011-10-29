@@ -34,9 +34,10 @@ namespace SKraft
             graphics.PreferredBackBufferHeight = 900;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
-           
-            player = new Player(this, new Vector3(9, 1, 9));
-            map = new Map(player);     
+
+            Vector3 playerPos = new Vector3(9, 1, 9);
+            map = new Map(playerPos);
+            player = new Player(this, playerPos, map);
             Components.Add(new Debug(this));
         }
 
@@ -93,10 +94,6 @@ namespace SKraft
             }
             
             player.Update(gameTime);
-            //if (!gameTime.IsRunningSlowly)
-            {
-                map.Update();
-            }
             //player.CheckClickedModel(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, objects3D, graphics);
             base.Update(gameTime);                        
         }
