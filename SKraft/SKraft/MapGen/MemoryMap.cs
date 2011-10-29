@@ -40,35 +40,10 @@ namespace SKraft.MapGen
             /// <param name="multipierX"></param>
             /// <param name="multipierZ"></param>
             /// <returns></returns>
-            internal void GetCubes(int fromX, int fromY, int fromZ, int toX, int toY, int toZ, int multipierX, int multipierZ, bool threading)
-            {
-                object[] args = new object[] {fromX, fromY, fromZ, toX, toY, toZ, multipierX, multipierZ };
-
-                if (threading)
-                {
-                    GetCubesThread = new Thread(GetCubesObject);
-                    GetCubesThread.Start(args);
-                }
-                else
-                {
-                    GetCubesObject(args);
-                }
-            }
-
-            private void GetCubesObject(object args)
+            public void GetCubes(int fromX, int fromY, int fromZ, int toX, int toY, int toZ, int multipierX, int multipierZ, bool behind)
             {
                 if (isExist)
                 {
-                    object[] argsArray = (object[])args;
-                    int fromX = (int)argsArray[0];
-                    int fromY = (int)argsArray[1];
-                    int fromZ = (int)argsArray[2];
-                    int toX = (int) argsArray[3];
-                    int toY = (int) argsArray[4];
-                    int toZ = (int) argsArray[5];
-                    int multipierX = (int) argsArray[6];
-                    int multipierZ = (int) argsArray[7];
-
                     if (toX == 0 || toX > SizeX)
                     {
                         toX = SizeX;
@@ -104,10 +79,20 @@ namespace SKraft.MapGen
                                 switch (bytes[x, y, z])
                                 {
                                     case 1:
-                                        Vector3 position = new Vector3((multipierX * SizeX) + x, y, (multipierZ * SizeZ) + z);
-                                        Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
-                                        if (cubePosPlayer.Z < -1) //jeśli cube bedzie przed kamerą to wyświetlać
+                                        if (!behind)
                                         {
+                                            Vector3 position = new Vector3((multipierX*SizeX) + x, y,
+                                                                           (multipierZ*SizeZ) + z);
+                                            Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
+                                            if (cubePosPlayer.Z < -1) //jeśli cube bedzie przed kamerą to wyświetlać
+                                            {
+                                                Cubes.Add(new SampleCube(position));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Vector3 position = new Vector3((multipierX * SizeX) + x, y,
+                                                                           (multipierZ * SizeZ) + z);
                                             Cubes.Add(new SampleCube(position));
                                         }
                                         break;
@@ -291,13 +276,7 @@ namespace SKraft.MapGen
             new SampleCube(Vector3.Zero).LoadContent(content);
         }
 
-        /// <summary>
-        /// Oblicza jakie cuby trzeba namalować
-        /// </summary>
-        /// <param name="playerPos">Pozycja gracza</param>
-        /// <param name="cubesLength">Ilość cubów do namalowania w jedną stronę od gracza</param>
-        /// <returns>Cuby do namalowania</returns>
-        public Cube[] GetDrawingCubes(Vector3 playerPos, int cubesLength)
+        private Cube[] GetCubes(Vector3 playerPos, int cubesLength, bool behind)
         {
             List<Cube> cubes = new List<Cube>();
 
@@ -377,7 +356,7 @@ namespace SKraft.MapGen
                                                    (int)posInSector.Y - cubesLength,
                                                    (int)posInSector.X + cubesLength + 1,
                                                    (int)playerPos.Y + cubesLength, (int)posInSector.Y + cubesLength + 1,
-                                                   (int)currentSector.X, (int)currentSector.Y, threading);
+                                                   (int)currentSector.X, (int)currentSector.Y, behind);
             }
 
             //TODO zmienić obliczanie Y
@@ -389,7 +368,7 @@ namespace SKraft.MapGen
                     sectors[5].GetCubes(0, (int)playerPos.Y - cubesLength, (int)posInSector.Y - cubesLength,
                                                        cubesLength - Sector.SizeX + (int)posInSector.X + 1,
                                                        (int)playerPos.Y + cubesLength, (int)posInSector.Y + cubesLength + 1,
-                                                       (int)currentSector.X + 1, (int)currentSector.Y, threading);
+                                                       (int)currentSector.X + 1, (int)currentSector.Y, behind);
                 }
 
                 if (sectors[8] != null)
@@ -401,7 +380,7 @@ namespace SKraft.MapGen
                                                            cubesLength - Sector.SizeX + (int) posInSector.X + 1,
                                                            (int)playerPos.Y + cubesLength,
                                                            cubesLength - Sector.SizeZ + (int) posInSector.Y + 1,
-                                                           (int)currentSector.X + 1, (int)currentSector.Y + 1, threading);
+                                                           (int)currentSector.X + 1, (int)currentSector.Y + 1, behind);
                     }
                 }
 
@@ -414,7 +393,7 @@ namespace SKraft.MapGen
                                                           cubesLength - Sector.SizeX + (int)posInSector.X + 1,
                                                           (int)playerPos.Y + cubesLength,
                                                           0,
-                                                          (int)currentSector.X + 1, (int)currentSector.Y - 1, threading);
+                                                          (int)currentSector.X + 1, (int)currentSector.Y - 1, behind);
                     }
                 }
             }
@@ -429,7 +408,7 @@ namespace SKraft.MapGen
                                                            (int) posInSector.X + cubesLength + 1,
                                                            (int)playerPos.Y + cubesLength,
                                                            cubesLength - Sector.SizeZ + (int) posInSector.Y + 1,
-                                                           (int)currentSector.X, (int)currentSector.Y + 1, threading);
+                                                           (int)currentSector.X, (int)currentSector.Y + 1, behind);
                     }
 
                     if (posInSector.X < cubesLength)
@@ -441,7 +420,7 @@ namespace SKraft.MapGen
                                                                 0,
                                                                 (int)playerPos.Y + cubesLength,
                                                                 cubesLength - Sector.SizeZ + (int)posInSector.Y + 1,
-                                                                (int)currentSector.X - 1, (int)currentSector.Y + 1, threading);
+                                                                (int)currentSector.X - 1, (int)currentSector.Y + 1, behind);
                         }
                     }
                 }
@@ -454,7 +433,7 @@ namespace SKraft.MapGen
                     sectors[3].GetCubes(Sector.SizeX - cubesLength + (int)posInSector.X, (int)playerPos.Y - cubesLength, (int)posInSector.Y - cubesLength,
                                                        0,
                                                        (int)playerPos.Y + cubesLength, (int)posInSector.Y + cubesLength + 1,
-                                                       (int)currentSector.X - 1, (int)currentSector.Y, threading);
+                                                       (int)currentSector.X - 1, (int)currentSector.Y, behind);
                 }
 
                 if (sectors[0] != null)
@@ -466,7 +445,7 @@ namespace SKraft.MapGen
                                                            Sector.SizeZ - cubesLength + (int) posInSector.Y,
                                                            0,
                                                            (int)playerPos.Y + cubesLength, 0,
-                                                           (int)currentSector.X - 1, (int)currentSector.Y - 1, threading);
+                                                           (int)currentSector.X - 1, (int)currentSector.Y - 1, behind);
                     }
                 }
             }
@@ -480,7 +459,7 @@ namespace SKraft.MapGen
                                                        Sector.SizeZ - cubesLength + (int) posInSector.Y,
                                                        (int) posInSector.X + cubesLength + 1,
                                                        (int)playerPos.Y + cubesLength, 0,
-                                                       (int)currentSector.X, (int)currentSector.Y - 1, threading);
+                                                       (int)currentSector.X, (int)currentSector.Y - 1, behind);
                 }
             }
 
@@ -574,6 +553,22 @@ namespace SKraft.MapGen
                     sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 20);
                 }
             }
+        }
+
+        /// <summary>
+        /// Oblicza jakie cuby trzeba namalować
+        /// </summary>
+        /// <param name="playerPos">Pozycja gracza</param>
+        /// <param name="cubesLength">Ilość cubów do namalowania w jedną stronę od gracza</param>
+        /// <returns>Cuby do namalowania</returns>
+        public Cube[] GetDrawingCubes(Vector3 playerPos, int cubesLength)
+        {
+            return GetCubes(playerPos, cubesLength, false);
+        }
+
+        public Cube[] GetNearestCubes(Vector3 position)
+        {
+            return GetCubes(position, 2, true);
         }
     }
 }

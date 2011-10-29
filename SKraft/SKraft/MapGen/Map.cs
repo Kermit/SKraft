@@ -73,7 +73,10 @@ namespace SKraft.MapGen
             cubes = memoryMap.GetDrawingCubes(position, 30);
         }
 
-        //public static void 
+        public Cube[] GetNearestCubes(Vector3 position)
+        {
+            return memoryMap.GetNearestCubes(position);
+        }
 
         public void Draw(GraphicsDevice graphicsDevice)
         {

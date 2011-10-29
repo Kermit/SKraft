@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SKraft.Cameras;
 using Microsoft.Xna.Framework.Input;
+using SKraft.Cubes;
 using SKraft.MapGen;
 
 namespace SKraft
@@ -123,6 +124,11 @@ namespace SKraft
                 fppCamera.Move(v.X, v.Z);
                 Move(v.X, v.Z);
                 mapUpdate = true;
+            }
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                Cube[] cubes = map.GetNearestCubes(Position);
             }
 
             if (target != targetRemember)
