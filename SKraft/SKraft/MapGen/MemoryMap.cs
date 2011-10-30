@@ -13,7 +13,7 @@ namespace SKraft.MapGen
 {
     class MemoryMap
     {
-        private class Sector
+        private class Sector : IDisposable
         {
             internal const int SizeX = 100;
             internal const int SizeY = 300;
@@ -23,8 +23,11 @@ namespace SKraft.MapGen
             public bool IsLoaded { get; private set; }
             internal List<Cube> Cubes { get; set; }
             internal Thread GetCubesThread { get; set; }
+            private bool isChanged = false;
+            private string mapName;
+            private int sectorX, sectorY;
 
-            internal byte[, ,] bytes = new byte[SizeX, SizeY, SizeZ];
+            private byte[, ,] bytes = new byte[SizeX, SizeY, SizeZ];
 
             internal Sector()
             {
@@ -103,7 +106,7 @@ namespace SKraft.MapGen
                 }
             }
 
-            public void SaveSector(string mapName, int sectorX, int sectorY)
+            public void SaveSector()
             {
                 BinaryWriter bw = null;
                 try
@@ -200,6 +203,9 @@ namespace SKraft.MapGen
             public void LoadSectorThread(string mapName, int sectorX, int sectorY, int slowing)
             {
                 IsLoaded = false;
+                this.mapName = mapName;
+                this.sectorX = sectorX;
+                this.sectorY = sectorY;
                 object[] argsArray = new object[] { mapName, sectorX, sectorY, slowing };
                 object args = argsArray;
 
@@ -210,6 +216,43 @@ namespace SKraft.MapGen
                     thread.Priority = ThreadPriority.Lowest;
                 }
                 thread.Start(args);
+            }
+
+            public void DeleteByte(int x, int y, int z)
+            {
+                bytes[x, y, z] = 0;
+                isChanged = true;
+            }
+
+            public void AddByte(int x, int y, int z, byte cubeByte)
+            {
+                bytes[x, y, z] = cubeByte;
+                isChanged = true;
+            }
+
+            /// <summary>
+            /// Przy zamknięciu gry zapis zmian do pliku
+            /// </summary>
+            ~Sector()
+            {
+                if (isChanged)
+                {
+                    isChanged = false;
+                    SaveSector();
+                }
+            }
+
+            /// <summary>
+            /// Przy zmianie sektora zapis zmian do pliku
+            /// </summary>
+            public void Dispose()
+            {
+                if (isChanged)
+                {
+                    Thread thread = new Thread(SaveSector);
+                    isChanged = false;
+                    thread.Start();
+                }
             }
         }
 
@@ -491,6 +534,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[5];
                     sectors[7] = sectors[8];
 
+                    sectors[2].Dispose();
+                    sectors[5].Dispose();
+                    sectors[8].Dispose();
                     sectors[2] = new Sector();
                     sectors[5] = new Sector();
                     sectors[8] = new Sector();
@@ -508,6 +554,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[3];
                     sectors[7] = sectors[6];
 
+                    sectors[0].Dispose();
+                    sectors[3].Dispose();
+                    sectors[6].Dispose();
                     sectors[0] = new Sector();
                     sectors[3] = new Sector();
                     sectors[6] = new Sector();
@@ -528,6 +577,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[7];
                     sectors[5] = sectors[8];
 
+                    sectors[6].Dispose();
+                    sectors[7].Dispose();
+                    sectors[8].Dispose();
                     sectors[6] = new Sector();
                     sectors[7] = new Sector();
                     sectors[8] = new Sector();
@@ -545,6 +597,9 @@ namespace SKraft.MapGen
                     sectors[4] = sectors[1];
                     sectors[5] = sectors[2];
 
+                    sectors[0].Dispose();
+                    sectors[1].Dispose();
+                    sectors[2].Dispose();
                     sectors[0] = new Sector();
                     sectors[1] = new Sector();
                     sectors[2] = new Sector();
@@ -568,7 +623,137 @@ namespace SKraft.MapGen
 
         public Cube[] GetNearestCubes(Vector3 position)
         {
-            return GetCubes(position, 2, true);
+            return GetCubes(position, 3, true);
+        }
+
+        /// <summary>
+        /// Usuwa cuba z mapy
+        /// </summary>
+        /// <param name="cube"></param>
+        public void DeleteCube(Cube cube)
+        {
+            int x = (int)(cube.Position.X - (currentSector.X * SectorSize.X));
+            int y = (int)cube.Position.Y;
+            int z = (int)(cube.Position.Z - (currentSector.Y * SectorSize.Z));
+
+            if (x > SectorSize.X - 1)
+            {
+                x -= (int)SectorSize.X;
+                if (z > SectorSize.Z - 1)
+                {
+                    z -= (int)SectorSize.Z;
+                    sectors[8].DeleteByte(x, y, z);
+                }
+                else if (z < 0)
+                {
+                    z += (int) SectorSize.Z;
+                    sectors[2].DeleteByte(x, y, z);
+                }
+                else
+                {
+                    sectors[5].DeleteByte(x, y, z);
+                }
+            }
+            else if (x < 0)
+            {
+                x += (int)SectorSize.X;
+                if (z > SectorSize.Z - 1)
+                {
+                    z -= (int)SectorSize.Z;
+                    sectors[6].DeleteByte(x, y, z);
+                }
+                else if (z < 0)
+                {
+                    z += (int)SectorSize.Z;
+                    sectors[0].DeleteByte(x, y, z);
+                }
+                else
+                {
+                    sectors[3].DeleteByte(x, y, z);
+                }
+            }
+            if (z > SectorSize.Z - 1)
+            {
+                z -= (int)SectorSize.Z;
+                sectors[7].DeleteByte(x, y, z);
+            }
+            else if (z < 0)
+            {
+                z += (int)SectorSize.Z;
+                sectors[1].DeleteByte(x, y, z);
+            }
+            else
+            {
+                sectors[4].DeleteByte(x, y, z);
+            }
+        }
+
+        /// <summary>
+        /// Dodaje cuba do mapy
+        /// </summary>
+        /// <param name="cube"></param>
+        public void AddCube(Cube cube)
+        {
+            byte cubeByte = 0;
+            if (cube is SampleCube)
+            {
+                cubeByte = 1;
+            }
+
+            int x = (int)(cube.Position.X - (currentSector.X * SectorSize.X));
+            int y = (int)cube.Position.Y;
+            int z = (int)(cube.Position.Z - (currentSector.Y * SectorSize.Z));
+
+            if (x > SectorSize.X - 1)
+            {
+                x -= (int)SectorSize.X;
+                if (z > SectorSize.Z - 1)
+                {
+                    z -= (int)SectorSize.Z;
+                    sectors[8].AddByte(x, y, z, cubeByte);
+                }
+                else if (z < 0)
+                {
+                    z += (int)SectorSize.Z;
+                    sectors[2].AddByte(x, y, z, cubeByte);
+                }
+                else
+                {
+                    sectors[5].AddByte(x, y, z, cubeByte);
+                }
+            }
+            else if (x < 0)
+            {
+                x += (int)SectorSize.X;
+                if (z > SectorSize.Z - 1)
+                {
+                    z -= (int)SectorSize.Z;
+                    sectors[6].AddByte(x, y, z, cubeByte);
+                }
+                else if (z < 0)
+                {
+                    z += (int)SectorSize.Z;
+                    sectors[0].AddByte(x, y, z, cubeByte);
+                }
+                else
+                {
+                    sectors[3].AddByte(x, y, z, cubeByte);
+                }
+            }
+            if (z > SectorSize.Z - 1)
+            {
+                z -= (int)SectorSize.Z;
+                sectors[7].AddByte(x, y, z, cubeByte);
+            }
+            else if (z < 0)
+            {
+                z += (int)SectorSize.Z;
+                sectors[1].AddByte(x, y, z, cubeByte);
+            }
+            else
+            {
+                sectors[4].AddByte(x, y, z, cubeByte);
+            }
         }
     }
 }

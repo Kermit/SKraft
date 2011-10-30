@@ -24,6 +24,10 @@ namespace SKraft
         private Vector2 mousePos;
         private Map map;
 
+        private Cube clickingCube; //cube, który jest aktualnie klikany
+        private int clickingCount; //liczy dlugosc trzymanej kliknietej myszki na obiekcie
+        private bool rightPressed; //sprawdza czy prawa mysz wcisnieta
+
         public Player(SKraft game, Vector3 position, Map map)
         {
             this.Position = position;
@@ -128,7 +132,20 @@ namespace SKraft
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                Cube[] cubes = map.GetNearestCubes(Position);
+                MouseClickLeft(ref mapUpdate);
+            }
+            else if (Mouse.GetState().RightButton == ButtonState.Pressed)
+            {
+                if (!rightPressed)
+                {
+                    rightPressed = true;
+                    MouseClicRight();
+                    mapUpdate = true;
+                }
+            }
+            else if (Mouse.GetState().RightButton == ButtonState.Released)
+            {
+                rightPressed = false;
             }
 
             if (target != targetRemember)
@@ -196,18 +213,79 @@ namespace SKraft
         /// <param name="y"></param>
         /// <param name="objects"></param>
         /// <param name="graphics"></param>
-        public void CheckClickedModel(int x, int y, List<Object3D> objects, GraphicsDeviceManager graphics)
+        private Object3D CheckClickedModel(Object3D[] objects)
         {
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            Vector3 nearsource = new Vector3(game.GraphicsDevice.Viewport.Width / 2, game.GraphicsDevice.Viewport.Height / 2, 0f);
+            Vector3 farsource = new Vector3(game.GraphicsDevice.Viewport.Width / 2, game.GraphicsDevice.Viewport.Height / 2, 1f);
+
+            Vector3 nearPoint = game.GraphicsDevice.Viewport.Unproject(nearsource, 
+                fppCamera.Projection, fppCamera.View,Matrix.CreateTranslation(0, 0, 0));
+            Vector3 farPoint = game.GraphicsDevice.Viewport.Unproject(farsource, 
+                fppCamera.Projection, fppCamera.View, Matrix.CreateTranslation(0, 0, 0));
+
+            Vector3 direction = farPoint - nearPoint;
+            direction.Normalize();
+            Ray pickRay = new Ray(nearPoint, direction);
+
+            float selectedDistance = 2.5f;
+            int selectedIndex = -1;
+            for (int i = 0; i < objects.Length; i++)
             {
+                if (objects[i].Exists)
+                {
+                    float? result = pickRay.Intersects(objects[i].BBox);
+                    if (result.HasValue)
+                    {
+                        if (result.Value < selectedDistance)
+                        {
+                            selectedIndex = i;
+                            selectedDistance = result.Value;
+                        }
+                    }
+                }
+            }
 
-                Vector3 nearsource = new Vector3(x, y, 0f);
-                Vector3 farsource = new Vector3(x, y, 1f);
+            if (selectedIndex > -1)
+            {
+                return objects[selectedIndex];
+            }
 
-                Vector3 nearPoint = graphics.GraphicsDevice.Viewport.Unproject(nearsource, 
-                    fppCamera.Projection, fppCamera.View,Matrix.CreateTranslation(0, 0, 0));
-                Vector3 farPoint = graphics.GraphicsDevice.Viewport.Unproject(farsource, 
-                    fppCamera.Projection, fppCamera.View, Matrix.CreateTranslation(0, 0, 0));
+            return null;
+        }
+
+        private void MouseClickLeft(ref bool update)
+        {
+            Cube cube = (Cube)CheckClickedModel(map.GetNearestCubes(new Vector3(Position.X, Position.Y + 1, Position.Z)));
+            if (cube != null)
+            {
+                if (clickingCube == null || clickingCube != cube)
+                {
+                    clickingCube = cube;
+                }
+
+                update = true;
+                map.DeleteCube(clickingCube);
+            }
+        }
+
+        private void MouseClicRight()
+        {
+            Cube cube = (Cube)CheckClickedModel(map.GetNearestCubes(new Vector3(Position.X, Position.Y + 1, Position.Z)));
+            if (cube != null)
+            {
+                BoundingBox[] boxes = cube.GetSideBBoxes();
+
+                Vector3 nearsource = new Vector3(game.GraphicsDevice.Viewport.Width/2,
+                                                 game.GraphicsDevice.Viewport.Height/2, 0f);
+                Vector3 farsource = new Vector3(game.GraphicsDevice.Viewport.Width/2,
+                                                game.GraphicsDevice.Viewport.Height/2, 1f);
+
+                Vector3 nearPoint = game.GraphicsDevice.Viewport.Unproject(nearsource,
+                                                                           fppCamera.Projection, fppCamera.View,
+                                                                           Matrix.CreateTranslation(0, 0, 0));
+                Vector3 farPoint = game.GraphicsDevice.Viewport.Unproject(farsource,
+                                                                          fppCamera.Projection, fppCamera.View,
+                                                                          Matrix.CreateTranslation(0, 0, 0));
 
                 Vector3 direction = farPoint - nearPoint;
                 direction.Normalize();
@@ -215,28 +293,49 @@ namespace SKraft
 
                 float selectedDistance = 2.5f;
                 int selectedIndex = -1;
-                for (int i = 0; i < objects.Count; i++)
+                for (int i = 0; i < boxes.Length; i++)
                 {
-                    if (objects[i].Exists)
+                    float? result = pickRay.Intersects(boxes[i]);
+                    if (result.HasValue)
                     {
-                        Vector3 pos = objects[i].Position;
-                        BoundingBox bounding = new BoundingBox(new Vector3(pos.X - 0.5f, pos.Y - 0.5f, pos.Z - 0.5f),
-                            new Vector3(pos.X + 0.5f, pos.Y + 0.5f, pos.Z + 0.5f));
-                        Nullable<float> result = pickRay.Intersects(bounding);
-                        if (result.HasValue)
+                        if (result.Value < selectedDistance)
                         {
-                            if (result.Value < selectedDistance)
-                            {
-                                selectedIndex = i;
-                                selectedDistance = result.Value;
-                            }
+                            selectedIndex = i;
+                            selectedDistance = result.Value;
                         }
                     }
                 }
 
-                if (selectedIndex > -1)
+                if (selectedIndex > -1) //kliknięto jakąs ścianę
                 {
-                    objects[selectedIndex].Exists = false;
+                    Vector3 newCubePos = cube.Position;
+
+                    switch (selectedIndex)
+                    {
+                        case (int)Cube.Side.Up:
+                            if (newCubePos.Y + 1 < MemoryMap.SectorSize.Y)
+                            {
+                                newCubePos.Y += 1;
+                            }
+                            break;
+                        case (int)Cube.Side.Bottom:
+                            newCubePos.Y -= 1;
+                            break;
+                        case (int)Cube.Side.Back:
+                            newCubePos.Z -= 1;
+                            break;
+                        case (int)Cube.Side.Front:
+                            newCubePos.Z += 1;
+                            break;
+                        case (int)Cube.Side.Left:
+                            newCubePos.X -= 1;
+                            break;
+                        case (int)Cube.Side.Right:
+                            newCubePos.X += 1;
+                            break;
+                    }
+
+                    map.AddCube(new SampleCube(newCubePos));
                 }
             }
         }

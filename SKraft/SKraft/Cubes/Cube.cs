@@ -16,6 +16,8 @@ namespace SKraft.Cubes
             public short bonus;
         }
 
+        public enum Side { Bottom = 0, Back = 1, Left = 2, Front = 3, Right = 4, Up = 5 }
+
         public abstract void LoadContent(ContentManager content);
 
         protected static Model cubeModel;
@@ -24,8 +26,6 @@ namespace SKraft.Cubes
         {
             get { return bonusObjects; }
         }
-
-        public BoundingBox BBox { get; private set; }
 
         public Cube(Vector3 position)
         {
@@ -36,8 +36,31 @@ namespace SKraft.Cubes
 
         }
 
+        /// <summary>
+        /// Zwraca BoundigBoksy każdej ze ścian
+        /// </summary>
+        /// <returns></returns>
+        public BoundingBox[] GetSideBBoxes()
+        {
+            BoundingBox[] boxes = new BoundingBox[6]; //ściany
+
+            boxes[(int)Side.Bottom] = new BoundingBox(BBox.Min, new Vector3(BBox.Max.X, BBox.Min.Y, BBox.Max.Z)); //dolna
+            boxes[(int)Side.Back] = new BoundingBox(BBox.Min, new Vector3(BBox.Max.X, BBox.Max.Y, BBox.Min.Z)); //tylna
+            boxes[(int)Side.Left] = new BoundingBox(BBox.Min, new Vector3(BBox.Min.X, BBox.Max.Y, BBox.Max.Z)); //lewa
+            boxes[(int)Side.Front] = new BoundingBox(new Vector3(BBox.Min.X, BBox.Min.Y, BBox.Max.Z), BBox.Max); //przednia
+            boxes[(int)Side.Right] = new BoundingBox(new Vector3(BBox.Max.X, BBox.Min.Y, BBox.Min.Z), BBox.Max); //prawa
+            boxes[(int)Side.Up] = new BoundingBox(new Vector3(BBox.Min.X, BBox.Max.Y, BBox.Min.Z), BBox.Max); //górna
+
+            return boxes;
+        }
+
         public override bool Equals(object cube)
         {
+            if (cube == null)
+            {
+                return false;
+            }
+
             if (cube is Cube)
             {
                 if (this == cube)
@@ -51,6 +74,21 @@ namespace SKraft.Cubes
 
         public static bool operator==(Cube cube1, Cube cube2)
         {
+            if ((object)cube1 == null)
+            {
+                if ((object)cube2 == null)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            if ((object)cube2 == null)
+            {
+                return false;
+            }
+
             if (cube1.Position == cube2.Position && cube1.GetType() == cube2.GetType())
             {
                 return true;

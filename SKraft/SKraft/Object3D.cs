@@ -35,9 +35,12 @@ namespace SKraft
 
         public bool Exists { get; set; }
 
+        public BoundingBox BBox { get; protected set; }
+        
         protected Object3D()
         {
             Exists = true;
+            BBox = new BoundingBox();
         }
 
         public void Hit(Cube cube)
@@ -94,8 +97,8 @@ namespace SKraft
                             }
 
                             //effect.EnableDefaultLighting();
-                            effect.World = transforms[mesh.ParentBone.Index]*
-                                           //Matrix.CreateRotationY(modelRotation)
+                            effect.World = transforms[mesh.ParentBone.Index] *
+                                           //Matrix.CreateRotationX(MathHelper.ToRadians(180)) * 
                                            Matrix.CreateTranslation(Position);
                             effect.View = Camera.ActiveCamera.View;
                             effect.Projection = Camera.ActiveCamera.Projection;

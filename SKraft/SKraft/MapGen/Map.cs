@@ -73,9 +73,32 @@ namespace SKraft.MapGen
             cubes = memoryMap.GetDrawingCubes(position, 30);
         }
 
+        /// <summary>
+        /// Zwraca najbliższe cuby z danej pozycji
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public Cube[] GetNearestCubes(Vector3 position)
         {
             return memoryMap.GetNearestCubes(position);
+        }
+
+        /// <summary>
+        /// Usuwa cuba z mapy
+        /// </summary>
+        /// <param name="cube"></param>
+        public void DeleteCube(Cube cube)
+        {
+            memoryMap.DeleteCube(cube);
+        }
+
+        /// <summary>
+        /// Dodaje cuba do mapy
+        /// </summary>
+        /// <param name="cube"></param>
+        public void AddCube(Cube cube)
+        {
+            memoryMap.AddCube(cube);
         }
 
         public void Draw(GraphicsDevice graphicsDevice)
