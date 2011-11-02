@@ -14,7 +14,6 @@ namespace SKraft
     public class Player : Object3D
     {
         private SKraft game;
-        private Matrix[] transforms;
         private FppCamera fppCamera;
 
         public float Speed { get; set; }
@@ -28,12 +27,18 @@ namespace SKraft
         private int clickingCount; //liczy dlugosc trzymanej kliknietej myszki na obiekcie
         private bool rightPressed; //sprawdza czy prawa mysz wcisnieta
 
+        /// <summary>
+        /// Określa obiekt będący w dłoni gracza
+        /// </summary>
+        private Object3D inHand;
+
         public Player(SKraft game, Vector3 position, Map map)
         {
             this.Position = position;
             this.game = game;
             this.map = map;
             fppCamera = new FppCamera(game, new Vector3(position.X, position.Y + 1, position.Z), Vector3.Zero, Vector3.Up);
+            Position = new Vector3(Position.X, 0, Position.Z);
 
             mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Speed = 0.1f;
@@ -44,9 +49,7 @@ namespace SKraft
 
         public void LoadContent()
         {
-            model = game.Content.Load<Model>(@"models\player");
-
-            transforms = new Matrix[model.Bones.Count];           
+            model = game.Content.Load<Model>(@"models\player");          
         }
 
         public override void Update(GameTime gameTime)
@@ -154,7 +157,9 @@ namespace SKraft
                 targetRemember = target;
             }
 
-            fppCamera.target = new Vector3(target.X, target.Y, 0);
+            UpdateItemInHand(state);
+
+            fppCamera.Target = new Vector3(target.X, target.Y, 0);
             Rotate(target.X, target.Y);
 
             if (mapUpdate || map.Loading)
@@ -168,31 +173,19 @@ namespace SKraft
             }
         }
 
-        public void Draw(GameTime gameTime)
+        private void UpdateItemInHand(KeyboardState state)
         {
-            model.CopyAbsoluteBoneTransformsTo(transforms);
-
-            foreach (ModelMesh mesh in model.Meshes)
+            if (state.IsKeyDown(Keys.I))
             {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.FogEnabled = true;
-                    effect.FogColor = Color.CornflowerBlue.ToVector3();
-                    effect.FogStart = 17f;
-                    effect.FogEnd = 21f;
-
-                    if (texture != null)
-                    {
-                        effect.Texture = texture;
-                    }
-
-                    effect.EnableDefaultLighting();
-                    effect.World = transforms[mesh.ParentBone.Index] * Matrix.CreateTranslation(Position);
-                    effect.View = Camera.ActiveCamera.View;
-                    effect.Projection = Camera.ActiveCamera.Projection;
-                }
-
-                mesh.Draw();
+                inHand = new SampleCube(Vector3.Zero);
+            }
+            if (inHand != null)
+            {
+                inHand.Position = Vector3.Transform(new Vector3(0.25f, -0.18f, -0.5f), Matrix.CreateRotationX(-target.Y) * Matrix.CreateRotationY(-target.X)
+                    * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y + 2, Position.Z)));
+                inHand.RotationY = -target.X;
+                inHand.RotationX = -target.Y;
+                inHand.Scale = 0.2f;
             }
         }
 
@@ -337,6 +330,14 @@ namespace SKraft
 
                     map.AddCube(new SampleCube(newCubePos));
                 }
+            }
+        }
+
+        public override void Draw()
+        {
+            if (inHand != null)
+            {
+                inHand.Draw();
             }
         }
     }

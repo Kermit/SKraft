@@ -15,13 +15,13 @@ namespace SKraft.Cameras
 
         private SKraft game;
         private Vector3 position;
-        public Vector3 target { get; set; }
+        public Vector3 Target { get; set; }
         private Vector2 mousePos;
 
         public FppCamera(SKraft game, Vector3 position, Vector3 target, Vector3 up) : base(game, position, target, up)
         {
             this.position = position;
-            this.target = target;
+            this.Target = target;
 
             this.game = game;
 
@@ -40,7 +40,7 @@ namespace SKraft.Cameras
         public override void Update(GameTime gameTime)
         {
             View = Matrix.CreateTranslation(-position);
-            View *= Matrix.CreateRotationY(target.X) * Matrix.CreateRotationX(target.Y);
+            View *= Matrix.CreateRotationY(Target.X) * Matrix.CreateRotationX(Target.Y);
             base.Update(gameTime);
         }
 

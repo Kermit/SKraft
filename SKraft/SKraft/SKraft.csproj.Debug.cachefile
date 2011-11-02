@@ -1,5 +1,6 @@
 Content\Models\cube.xnb
 Content\Models\player.xnb
+Content\Models\cubeNoInst.xnb
 Content\Models\texture.xnb
 Content\Textures\texture2.xnb
 Content\Textures\texture2low.xnb

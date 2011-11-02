@@ -20,20 +20,23 @@ namespace SKraft.Cubes
 
             Bonus bonus = new Bonus {type = typeof(Cube), bonus = 1};
             this.BonusObjects.Add(bonus);
+
+            model = cubeModel;
+            texture = sampleTex;
         }
 
         public override void LoadContent(ContentManager content)
         {
             if (cubeModel == null)
             {
-                cubeModel = content.Load<Model>(@"models\cube");
+                cubeModel = content.Load<Model>(@"models\cubeNoInst");
             }
 
             if (sampleTex == null)
             {
                 sampleTex = content.Load<Texture2D>(@"textures\texture2low2");
             }
-
+            
             model = cubeModel;
             texture = sampleTex;
         }

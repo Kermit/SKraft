@@ -14,9 +14,13 @@ namespace SKraft
         protected short life;
         protected string name;
         protected Texture2D icon;
-        public Model model; //zabezpieczyc
-        public Vector3 Position { get; protected set; }
+        protected Model model; //zabezpieczyc
+        public Vector3 Position { get; set; }
+        public float Scale { get; set; }
+        public float RotationX { get; set; }
+        public float RotationY { get; set; }
         protected Texture2D texture;
+        private Matrix[] transforms;
 
         /// <summary>
         /// Określa moc danego obiektu podczas uderzania
@@ -40,6 +44,7 @@ namespace SKraft
         protected Object3D()
         {
             Exists = true;
+            Scale = 1;
             BBox = new BoundingBox();
         }
 
@@ -79,26 +84,26 @@ namespace SKraft
 
                 if (viewFrustum.Intersects(sourceSphere))
                 {
-                    Matrix[] transforms = new Matrix[model.Bones.Count];
-                    model.CopyAbsoluteBoneTransformsTo(transforms);
+                    if (transforms == null)
+                    {
+                        transforms = new Matrix[model.Bones.Count];
+                        model.CopyAbsoluteBoneTransformsTo(transforms);
+                    }
                     
                     foreach (ModelMesh mesh in model.Meshes)
                     {
                         foreach (BasicEffect effect in mesh.Effects)
                         {
-                            effect.FogEnabled = true;
-                            effect.FogColor = Color.CornflowerBlue.ToVector3();
-                            effect.FogStart = 17f;
-                            effect.FogEnd = 21f;
-
                             if (texture != null)
                             {
                                 effect.Texture = texture;
                             }
 
-                            //effect.EnableDefaultLighting();
+                            effect.EnableDefaultLighting();
                             effect.World = transforms[mesh.ParentBone.Index] *
-                                           //Matrix.CreateRotationX(MathHelper.ToRadians(180)) * 
+                                           Matrix.CreateScale(Scale) *
+                                           Matrix.CreateRotationX(RotationX) *
+                                           Matrix.CreateRotationY(RotationY) * 
                                            Matrix.CreateTranslation(Position);
                             effect.View = Camera.ActiveCamera.View;
                             effect.Projection = Camera.ActiveCamera.Projection;

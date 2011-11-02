@@ -26,6 +26,7 @@ namespace SKraft
         
         FpsCounter fpsCounter = new FpsCounter();
         private Texture2D crosshair;
+        public static GraphicsDevice Graphics;
 
         public SKraft()
         {
@@ -34,8 +35,9 @@ namespace SKraft
             graphics.PreferredBackBufferHeight = 900;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
+            Graphics = GraphicsDevice;
 
-            Vector3 playerPos = new Vector3(9, 1, 9);
+            Vector3 playerPos = new Vector3(1, 1, 1);
             map = new Map(playerPos);
             player = new Player(this, playerPos, map);
             Components.Add(new Debug(this));
@@ -64,7 +66,8 @@ namespace SKraft
             spriteBatch = new SpriteBatch(GraphicsDevice);
             crosshair = Content.Load<Texture2D>("crosshair");
             map.LoadContent(Content);
-            
+            new SampleCube(Vector3.Zero).LoadContent(Content);
+
             player.LoadContent();
             // TODO: use this.Content to load your game content here
         }
@@ -109,6 +112,7 @@ namespace SKraft
 
             Debug.Start("drawing");
             map.Draw(GraphicsDevice);
+            player.Draw();
             Debug.Stop("drawing");
 
             spriteBatch.Begin();
