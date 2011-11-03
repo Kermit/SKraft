@@ -11,7 +11,14 @@ namespace SKraft
 {
     public abstract class Object3D
     {
-        protected short life;
+        protected int life;
+        public virtual int Life 
+        { 
+            get
+            {
+                return life;
+            }
+        }
         protected string name;
         protected Texture2D icon;
         protected Model model; //zabezpieczyc
@@ -50,28 +57,33 @@ namespace SKraft
 
         public void Hit(Cube cube)
         {
-            int hitPower = 0;
-            short bonus = 0;
-
-            foreach (Cube.Bonus bonusObject in cube.BonusObjects)
+            if (Exists)
             {
-                if (bonusObject.type == this.GetType())
+                int hitPower = 0;
+                short bonus = 0;
+
+                foreach (Cube.Bonus bonusObject in cube.BonusObjects)
                 {
-                    bonus = bonusObject.bonus;
-                    break;
+                    if (bonusObject.type == this.GetType())
+                    {
+                        bonus = bonusObject.bonus;
+                        break;
+                    }
                 }
-            }
 
-            hitPower = Power + bonus;
+                hitPower = Power + bonus;
 
-            if (!(this is Cube))
-            {
-                --life;
-            }
+                if (!(this is Cube))
+                {
+                    --life;
+                }
 
-            if (life <= 0)
-            {
-                Exists = false;
+                if (life <= 0)
+                {
+                    Exists = false;
+                }
+
+                cube.Life -= hitPower;
             }
         }
 

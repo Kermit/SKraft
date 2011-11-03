@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using SKraft.MapGen;
 
 namespace SKraft.Cubes
 {
@@ -14,11 +15,11 @@ namespace SKraft.Cubes
         public SampleCube(Vector3 position)
             : base(position)
         {
-            this.life = 1000;
+            this.life = 100;
             this.name = "Sample Cube";
-            this.Power = 1;
+            this.Power = 20;
 
-            Bonus bonus = new Bonus {type = typeof(Cube), bonus = 1};
+            Bonus bonus = new Bonus {type = typeof(Cube), bonus = 0};
             this.BonusObjects.Add(bonus);
 
             model = cubeModel;

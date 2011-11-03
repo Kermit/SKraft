@@ -22,7 +22,7 @@ namespace SKraft
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         private Player player;
-        private Map map;
+        public static Map Map;
         
         FpsCounter fpsCounter = new FpsCounter();
         private Texture2D crosshair;
@@ -38,8 +38,8 @@ namespace SKraft
             Graphics = GraphicsDevice;
 
             Vector3 playerPos = new Vector3(1, 1, 1);
-            map = new Map(playerPos);
-            player = new Player(this, playerPos, map);
+            Map = new Map(playerPos);
+            player = new Player(this, playerPos, Map);
             Components.Add(new Debug(this));
         }
 
@@ -51,7 +51,7 @@ namespace SKraft
         /// </summary>
         protected override void Initialize()
         {
-            map.Initialize();
+            Map.Initialize();
 
             base.Initialize();
         }
@@ -65,7 +65,7 @@ namespace SKraft
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             crosshair = Content.Load<Texture2D>("crosshair");
-            map.LoadContent(Content);
+            Map.LoadContent(Content);
             new SampleCube(Vector3.Zero).LoadContent(Content);
 
             player.LoadContent();
@@ -111,7 +111,7 @@ namespace SKraft
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             Debug.Start("drawing");
-            map.Draw(GraphicsDevice);
+            Map.Draw(GraphicsDevice);
             player.Draw();
             Debug.Stop("drawing");
 

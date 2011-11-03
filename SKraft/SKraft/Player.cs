@@ -25,6 +25,8 @@ namespace SKraft
 
         private Cube clickingCube; //cube, który jest aktualnie klikany
         private int clickingCount; //liczy dlugosc trzymanej kliknietej myszki na obiekcie
+        private bool clickingCountPositive = true; //czy cliking count rosnie
+
         private bool rightPressed; //sprawdza czy prawa mysz wcisnieta
 
         /// <summary>
@@ -137,12 +139,19 @@ namespace SKraft
             {
                 MouseClickLeft(ref mapUpdate);
             }
-            else if (Mouse.GetState().RightButton == ButtonState.Pressed)
+            else if (Mouse.GetState().LeftButton == ButtonState.Released)
+            {
+                clickingCount = 0;
+                clickingCountPositive = true;
+                clickingCube = null;
+            }
+            
+            if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
                 if (!rightPressed)
                 {
                     rightPressed = true;
-                    MouseClicRight();
+                    MouseClickRight();
                     mapUpdate = true;
                 }
             }
@@ -181,10 +190,11 @@ namespace SKraft
             }
             if (inHand != null)
             {
-                inHand.Position = Vector3.Transform(new Vector3(0.25f, -0.18f, -0.5f), Matrix.CreateRotationX(-target.Y) * Matrix.CreateRotationY(-target.X)
-                    * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y + 2, Position.Z)));
+                Matrix matrix = Matrix.CreateRotationX(-target.Y)*Matrix.CreateRotationY(-target.X)
+                             * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y + 2, Position.Z));
+                inHand.Position = Vector3.Transform(new Vector3(0.25f, -0.18f - clickingCount / 170f, -0.5f - clickingCount / 40f), matrix);
                 inHand.RotationY = -target.X;
-                inHand.RotationX = -target.Y;
+                inHand.RotationX = -target.Y - clickingCount / 70f;
                 inHand.Scale = 0.2f;
             }
         }
@@ -248,20 +258,44 @@ namespace SKraft
 
         private void MouseClickLeft(ref bool update)
         {
-            Cube cube = (Cube)CheckClickedModel(map.GetNearestCubes(new Vector3(Position.X, Position.Y + 1, Position.Z)));
-            if (cube != null)
+            if (clickingCountPositive)
             {
-                if (clickingCube == null || clickingCube != cube)
-                {
-                    clickingCube = cube;
-                }
+                clickingCount += 3;
 
-                update = true;
-                map.DeleteCube(clickingCube);
+                if (clickingCount > 20)
+                {
+                    clickingCount = 20;
+                    clickingCountPositive = false;
+
+                    Cube cube = (Cube)CheckClickedModel(map.GetNearestCubes(new Vector3(Position.X, Position.Y + 1, Position.Z)));
+                    if (cube != null)
+                    {
+                        if (clickingCube == null || clickingCube != cube)
+                        {
+                            clickingCube = cube;
+                        }
+
+                        if (inHand != null)
+                        {
+                            inHand.Hit(clickingCube);
+                            update = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                --clickingCount;
+
+                if (clickingCount < 0)
+                {
+                    clickingCount = 0;
+                    clickingCountPositive = true;
+                }
             }
         }
 
-        private void MouseClicRight()
+        private void MouseClickRight()
         {
             Cube cube = (Cube)CheckClickedModel(map.GetNearestCubes(new Vector3(Position.X, Position.Y + 1, Position.Z)));
             if (cube != null)

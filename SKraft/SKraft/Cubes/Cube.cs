@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using SKraft.MapGen;
 
 namespace SKraft.Cubes
 {
@@ -14,6 +15,24 @@ namespace SKraft.Cubes
         {
             public Type type;
             public short bonus;
+        }
+
+        public int Life 
+        { 
+            get
+            {
+                return life;
+            } 
+            set 
+            { 
+                life = value;
+                if (life < 0)
+                {
+                    life = 0;
+                    Exists = false;
+                    SKraft.Map.DeleteCube(this);
+                }
+            }
         }
 
         public enum Side { Bottom = 0, Back = 1, Left = 2, Front = 3, Right = 4, Up = 5 }
@@ -33,7 +52,6 @@ namespace SKraft.Cubes
 
             BBox = new BoundingBox(new Vector3(Position.X - 0.5f, Position.Y - 0.5f, Position.Z - 0.5f),
                             new Vector3(Position.X + 0.5f, Position.Y + 0.5f, Position.Z + 0.5f));
-
         }
 
         /// <summary>
