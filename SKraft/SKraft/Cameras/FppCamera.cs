@@ -44,10 +44,11 @@ namespace SKraft.Cameras
             base.Update(gameTime);
         }
 
-        public void Move(float x, float z)
+        public void Move(Vector3 move)
         {
-            position.X += x;
-            position.Z -= z;
+            position.X += move.X;
+            position.Y += move.Y;
+            position.Z -= move.Z;
         }
     }
 }

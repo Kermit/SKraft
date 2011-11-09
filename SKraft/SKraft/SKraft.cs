@@ -126,6 +126,8 @@ namespace SKraft
             Debug.AddString(String.Format("Draw calls: {0}", drawCalls));
             Debug.AddStringTimer("Drawing time", "drawing");
             Debug.AddString(String.Format("Player pos: {0}", player.Position));
+            Debug.AddString(String.Format("Camera view: {0}", Camera.ActiveCamera.View.Translation));
+            Debug.AddString(String.Format("Collison {0}", player.collison));
 
             base.Draw(gameTime);
             /*

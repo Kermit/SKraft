@@ -22,12 +22,19 @@ namespace SKraft
         private Vector3 targetRemember = new Vector3(); //zapamietuje obrot, aby updetowac mape
         private Vector2 mousePos;
         private Map map;
+        private BoundingSphere bSphere;
+        public Vector3 collison { get; private set; }
 
         private Cube clickingCube; //cube, który jest aktualnie klikany
         private int clickingCount; //liczy dlugosc trzymanej kliknietej myszki na obiekcie
         private bool clickingCountPositive = true; //czy cliking count rosnie
 
         private bool rightPressed; //sprawdza czy prawa mysz wcisnieta
+
+        //Skoki
+        private float jumpY = 0;
+        private bool up = true;
+        private bool jump = false;
 
         /// <summary>
         /// Określa obiekt będący w dłoni gracza
@@ -40,18 +47,17 @@ namespace SKraft
             this.game = game;
             this.map = map;
             fppCamera = new FppCamera(game, new Vector3(position.X, position.Y + 1, position.Z), Vector3.Zero, Vector3.Up);
-            Position = new Vector3(Position.X, 0, Position.Z);
 
             mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Speed = 0.1f;
             MouseSpeed = 10;
-            
+                        
             game.Components.Add(fppCamera);
         }
 
         public void LoadContent()
         {
-            model = game.Content.Load<Model>(@"models\player");          
+            model = game.Content.Load<Model>(@"models\player");            
         }
 
         public override void Update(GameTime gameTime)
@@ -99,41 +105,64 @@ namespace SKraft
 
             Matrix forwardMovement = Matrix.CreateRotationY(target.X);
             KeyboardState state = Keyboard.GetState();
+            Vector3 v = Vector3.Zero;
             if (state.IsKeyDown(Keys.W))
             {
-                Vector3 v = new Vector3(0, 0, Speed);
-                v = Vector3.Transform(v, forwardMovement);
-                fppCamera.Move(v.X, v.Z);
-                Move(v.X, v.Z);
+                v.Z += Speed;
                 mapUpdate = true;
             }
 
             if (state.IsKeyDown(Keys.S))
             {
-                Vector3 v = new Vector3(0, 0, -Speed);
-                v = Vector3.Transform(v, forwardMovement);
-                fppCamera.Move(v.X, v.Z);
-                Move(v.X, v.Z);
+                v.Z -= Speed;
                 mapUpdate = true;
             }
 
             if (state.IsKeyDown(Keys.A))
             {
-                Vector3 v = new Vector3(-Speed, 0, 0);
-                v = Vector3.Transform(v, forwardMovement);
-                fppCamera.Move(v.X, v.Z);
-                Move(v.X, v.Z);
+                v.X -= Speed;
                 mapUpdate = true;
             }
 
             if (state.IsKeyDown(Keys.D))
             {
-                Vector3 v = new Vector3(Speed, 0, 0);
-                v = Vector3.Transform(v, forwardMovement);
-                fppCamera.Move(v.X, v.Z);
-                Move(v.X, v.Z);
+                v.X += Speed;
                 mapUpdate = true;
             }
+
+            if (state.GetPressedKeys().Contains(Keys.Space))
+            {
+                jump = true;
+            }
+
+            if (jump)
+            {
+                if (jumpY == 0)
+                {
+                    jumpY = Position.Y;
+                }
+
+                if (up && (Position.Y - jumpY) < 1.5)
+                {
+                    v.Y += Speed;
+                }
+                else
+                {
+                    v.Y -= Speed;
+                    up = false;
+                }
+                mapUpdate = true;
+            }
+
+            if (!jump)
+            {
+                v.Y -= Speed;
+            }
+
+            v = Vector3.Transform(v, forwardMovement);
+            v = CheckCollison(v);
+            fppCamera.Move(v);
+            Move(v);
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
@@ -180,6 +209,8 @@ namespace SKraft
 
                 map.Update(Position);
             }
+
+            bSphere = new BoundingSphere(Position, 0.5f);
         }
 
         private void UpdateItemInHand(KeyboardState state)
@@ -191,7 +222,7 @@ namespace SKraft
             if (inHand != null)
             {
                 Matrix matrix = Matrix.CreateRotationX(-target.Y)*Matrix.CreateRotationY(-target.X)
-                             * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y + 2, Position.Z));
+                             * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y + 1, Position.Z));
                 inHand.Position = Vector3.Transform(new Vector3(0.25f, -0.18f - clickingCount / 170f, -0.5f - clickingCount / 40f), matrix);
                 inHand.RotationY = -target.X;
                 inHand.RotationX = -target.Y - clickingCount / 70f;
@@ -199,14 +230,67 @@ namespace SKraft
             }
         }
 
-        public void Move(float x, float z)
+        public void Move(Vector3 move)
         {
-            Position = new Vector3(Position.X + x, 0, Position.Z - z);
+            Position = new Vector3(Position.X + move.X, Position.Y + move.Y, Position.Z - move.Z);
         }
 
         public void Rotate(float x, float y)
         {
             model.Root.Transform = Matrix.CreateRotationY(-x);
+        }
+
+        private Vector3 CheckCollison(Vector3 v)
+        {
+            Vector3 newPos1 = new Vector3(Position.X, Position.Y, Position.Z - v.Z);
+            Vector3 newPos2 = new Vector3(Position.X + v.X, Position.Y, Position.Z);
+            Vector3 newPos3 = new Vector3(Position.X, Position.Y + v.Y, Position.Z);
+
+            BoundingBox tempBBox1 = new BoundingBox(new Vector3(newPos1.X - 0.45f, newPos1.Y - 0.49f, newPos1.Z - 0.45f),
+                new Vector3(newPos1.X + 0.45f, newPos1.Y + 1.0f, newPos1.Z + 0.45f));
+            BoundingBox tempBBox2 = new BoundingBox(new Vector3(newPos2.X - 0.45f, newPos2.Y - 0.49f, newPos2.Z - 0.45f),
+                new Vector3(newPos2.X + 0.45f, newPos2.Y + 1.0f, newPos2.Z + 0.45f));
+            BoundingBox tempBBox3 = new BoundingBox(new Vector3(newPos3.X - 0.45f, newPos3.Y - 0.49f, newPos3.Z - 0.45f),
+                new Vector3(newPos3.X + 0.45f, newPos3.Y + 1.0f, newPos3.Z + 0.45f));
+
+            foreach (Cube cube in map.GetNearestCubes(newPos1))
+            {
+                if (cube.BBox.Intersects(tempBBox1))
+                {
+                    v.Z = 0;
+                }
+            }
+
+            foreach (Cube cube in map.GetNearestCubes(newPos2))
+            {
+                if (cube.BBox.Intersects(tempBBox2))
+                {
+                    v.X = 0;
+                }
+            }
+
+            foreach (Cube cube in map.GetNearestCubes(newPos3))
+            {
+                if (cube.BBox.Intersects(tempBBox3))
+                {
+                    if (v.Y > 0)
+                    {
+                        v.Y *= -1;
+                        up = false;
+                        break;
+                    }
+
+                    if (v.Y < 0)
+                    {
+                        v.Y = 0;
+                        jumpY = 0;
+                        jump = false;
+                        up = true;
+                    }
+                }
+            }
+
+            return v;
         }
 
         /// <summary>
