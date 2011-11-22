@@ -17,6 +17,7 @@ namespace SKraft
         private FppCamera fppCamera;
 
         public float Speed { get; set; }
+        private float jumpSpeed;
         public float MouseSpeed { get; set; }
         private Vector3 target;
         private Vector3 targetRemember = new Vector3(); //zapamietuje obrot, aby updetowac mape
@@ -50,6 +51,7 @@ namespace SKraft
 
             mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             Speed = 0.1f;
+            jumpSpeed = 0;
             MouseSpeed = 10;
                         
             game.Components.Add(fppCamera);
@@ -144,11 +146,17 @@ namespace SKraft
 
                 if (up && (Position.Y - jumpY) < 1.5)
                 {
-                    v.Y += Speed;
+                    v.Y += jumpSpeed;
+
+                    if ((Position.Y - jumpY) > 0.75)
+                        jumpSpeed -= 0.01f;
+                    else
+                        jumpSpeed += 0.01f;
                 }
                 else
                 {
-                    v.Y -= Speed;
+                    v.Y += jumpSpeed;
+                    jumpSpeed -= 0.01f;
                     up = false;
                 }
                 mapUpdate = true;
@@ -156,7 +164,8 @@ namespace SKraft
 
             if (!jump)
             {
-                v.Y -= Speed;
+                v.Y += jumpSpeed;
+                jumpSpeed -= 0.01f;
             }
 
             v = Vector3.Transform(v, forwardMovement);
@@ -277,6 +286,7 @@ namespace SKraft
                     {
                         v.Y *= -1;
                         up = false;
+                        jumpSpeed = 0;
                         break;
                     }
 
@@ -285,6 +295,7 @@ namespace SKraft
                         v.Y = 0;
                         jumpY = 0;
                         jump = false;
+                        jumpSpeed = 0;
                         up = true;
                     }
                 }
@@ -402,7 +413,7 @@ namespace SKraft
                 direction.Normalize();
                 Ray pickRay = new Ray(nearPoint, direction);
 
-                float selectedDistance = 2.5f;
+                float selectedDistance = 10f;
                 int selectedIndex = -1;
                 for (int i = 0; i < boxes.Length; i++)
                 {

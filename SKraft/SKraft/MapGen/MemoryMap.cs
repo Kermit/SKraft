@@ -623,7 +623,7 @@ namespace SKraft.MapGen
 
         public Cube[] GetNearestCubes(Vector3 position)
         {
-            return GetCubes(position, 3, true);
+            return GetCubes(position, 9, true);
         }
 
         /// <summary>

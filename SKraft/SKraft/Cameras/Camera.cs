@@ -25,7 +25,7 @@ namespace SKraft.Cameras
             View = Matrix.CreateLookAt(position, target, up);
             Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
                                                              (float)Game.Window.ClientBounds.Width /
-                                                             (float)Game.Window.ClientBounds.Height, 0.1f, 70);
+                                                             (float)Game.Window.ClientBounds.Height, 0.1f, 100);
             
             if (ActiveCamera == null)
             {

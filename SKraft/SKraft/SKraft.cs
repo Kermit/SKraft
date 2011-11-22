@@ -31,8 +31,8 @@ namespace SKraft
         public SKraft()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 1440;
-            graphics.PreferredBackBufferHeight = 900;
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
             Graphics = GraphicsDevice;
