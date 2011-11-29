@@ -111,7 +111,8 @@
     <Compile Include="Cameras\FppCamera.cs" />
     <Compile Include="Cameras\FreeCamera.cs" />
     <Compile Include="Cubes\Cube.cs" />
-    <Compile Include="Cubes\SampleCube.cs" />
+    <Compile Include="Cubes\Grass.cs" />
+    <Compile Include="Cubes\Stone.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="FpsCounter.cs" />
     <Compile Include="MapGen\Map.cs" />

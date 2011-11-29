@@ -226,11 +226,11 @@ namespace SKraft
         {
             if (state.IsKeyDown(Keys.I))
             {
-                inHand = new SampleCube(Vector3.Zero);
+                inHand = new Stone(Vector3.Zero);
             }
             if (inHand != null)
             {
-                Matrix matrix = Matrix.CreateRotationX(-target.Y)*Matrix.CreateRotationY(-target.X)
+                Matrix matrix = Matrix.CreateRotationX(-target.Y) * Matrix.CreateRotationY(-target.X)
                              * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y + 1, Position.Z));
                 inHand.Position = Vector3.Transform(new Vector3(0.25f, -0.18f - clickingCount / 170f, -0.5f - clickingCount / 40f), matrix);
                 inHand.RotationY = -target.X;
@@ -246,7 +246,7 @@ namespace SKraft
 
         public void Rotate(float x, float y)
         {
-            model.Root.Transform = Matrix.CreateRotationY(-x);
+            //model.Root.Transform = Matrix.CreateRotationY(-x);
         }
 
         private Vector3 CheckCollison(Vector3 v)
@@ -255,7 +255,7 @@ namespace SKraft
             Vector3 newPos2 = new Vector3(Position.X + v.X, Position.Y, Position.Z);
             Vector3 newPos3 = new Vector3(Position.X, Position.Y + v.Y, Position.Z);
 
-            BoundingBox tempBBox1 = new BoundingBox(new Vector3(newPos1.X - 0.45f, newPos1.Y - 0.49f, newPos1.Z - 0.45f),
+            BoundingBox tempBBox1 = new BoundingBox(new Vector3(newPos1.X - 0.4f, newPos1.Y - 0.49f, newPos1.Z - 0.45f),
                 new Vector3(newPos1.X + 0.45f, newPos1.Y + 1.0f, newPos1.Z + 0.45f));
             BoundingBox tempBBox2 = new BoundingBox(new Vector3(newPos2.X - 0.45f, newPos2.Y - 0.49f, newPos2.Z - 0.45f),
                 new Vector3(newPos2.X + 0.45f, newPos2.Y + 1.0f, newPos2.Z + 0.45f));
@@ -355,7 +355,7 @@ namespace SKraft
         {
             if (clickingCountPositive)
             {
-                clickingCount += 3;
+                clickingCount += 20;
 
                 if (clickingCount > 20)
                 {
@@ -457,7 +457,7 @@ namespace SKraft
                             break;
                     }
 
-                    map.AddCube(new SampleCube(newCubePos));
+                    map.AddCube(new Stone(newCubePos));
                 }
             }
         }

@@ -66,7 +66,6 @@ namespace SKraft
             spriteBatch = new SpriteBatch(GraphicsDevice);
             crosshair = Content.Load<Texture2D>("crosshair");
             Map.LoadContent(Content);
-            new SampleCube(Vector3.Zero).LoadContent(Content);
 
             player.LoadContent();
             // TODO: use this.Content to load your game content here

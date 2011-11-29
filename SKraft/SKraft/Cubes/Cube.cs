@@ -11,6 +11,15 @@ namespace SKraft.Cubes
 {
     public abstract class Cube : Object3D
     {
+        public int Index { get; protected set; }
+        public Texture2D Texture
+        {
+            get
+            {
+                return texture;
+            }
+        }
+
         public struct Bonus
         {
             public Type type;

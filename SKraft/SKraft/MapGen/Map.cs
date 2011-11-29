@@ -12,13 +12,15 @@ namespace SKraft.MapGen
 {
     public class Map
     {
-        private Cube[] cubes;
+        private Cube[] allCubes;
         Matrix[] instanceTransforms;
         Model instancedModel;
         Matrix[] instancedModelBones;
         DynamicVertexBuffer instanceVertexBuffer;
         ContentManager content;
         private MemoryMap memoryMap;
+        Dictionary<int, List<Cube>> cubesList;
+
         public bool Loading
         {
             get { return memoryMap.Loading; }
@@ -37,27 +39,11 @@ namespace SKraft.MapGen
         public Map(Vector3 playerPos)
         {
             memoryMap = new MemoryMap(playerPos, false);
-            cubes = new Cube[0];
+            allCubes = new Cube[0];
+            cubesList = new Dictionary<int, List<Cube>>();
         }
 
-        public void Initialize()
-        {
-            /*for (int x = 0; x < 50; ++x)
-            {
-                for (int z = 0; z < 30; ++z)
-                {
-                    cubes.Add(new SampleCube(new Vector3(x, 0, z)));
-                }
-            }
-
-            for (int z = 10; z < 30; ++z)
-            {
-                for (int y = 0; y < 5; ++y)
-                {
-                    cubes.Add(new SampleCube(new Vector3(10, y, z)));
-                }
-            }*/
-        }
+        public void Initialize() { }
 
         public void LoadContent(ContentManager content)
         {
@@ -66,11 +52,24 @@ namespace SKraft.MapGen
             instancedModel = content.Load<Model>(@"models\cube");
             instancedModelBones = new Matrix[instancedModel.Bones.Count];
             instancedModel.CopyAbsoluteBoneTransformsTo(instancedModelBones);
+
+            memoryMap.LoadContent(content);
         }
 
         public void Update(Vector3 position)
         {
-            cubes = memoryMap.GetDrawingCubes(position, 30);
+            allCubes = memoryMap.GetDrawingCubes(position, 30);
+            cubesList = new Dictionary<int, List<Cube>>();
+
+            foreach (Cube cb in allCubes)
+            {
+                if (!cubesList.ContainsKey(cb.Index))
+                {
+                    cubesList.Add(cb.Index, new List<Cube>());
+                }
+
+                cubesList[cb.Index].Add(cb);
+            }
         }
 
         /// <summary>
@@ -103,60 +102,63 @@ namespace SKraft.MapGen
 
         public void Draw(GraphicsDevice graphicsDevice)
         {
-            if (cubes.Length > 0)
+            foreach (List<Cube> cubes in cubesList.Values)
             {
-                Debug.AddString("Drawing cubes: " + cubes.Length);
-                Array.Resize(ref instanceTransforms, cubes.Length);
-
-                for (int i = 0; i < cubes.Length; i++)
+                if (cubes.Count > 0)
                 {
-                    instanceTransforms[i] = Matrix.CreateTranslation(cubes[i].Position);
-                }
-                // Rysujemy wszystko za jednym zamachem
+                    Debug.AddString("Drawing cubes: " + cubes.Count);
+                    Array.Resize(ref instanceTransforms, cubes.Count);
 
-                // Poszerzany bufory jeśli potrzeba.
-                if ((instanceVertexBuffer == null) || (cubes.Length > instanceVertexBuffer.VertexCount))
-                {
-                    if (instanceVertexBuffer != null)
+                    for (int i = 0; i < cubes.Count; i++)
                     {
-                        instanceVertexBuffer.Dispose();
+                        instanceTransforms[i] = Matrix.CreateTranslation(cubes[i].Position);
+                    }
+                    // Rysujemy wszystko za jednym zamachem
+
+                    // Poszerzany bufory jeśli potrzeba.
+                    if ((instanceVertexBuffer == null) || (cubes.Count > instanceVertexBuffer.VertexCount))
+                    {
+                        if (instanceVertexBuffer != null)
+                        {
+                            instanceVertexBuffer.Dispose();
+                        }
+
+                        instanceVertexBuffer = new DynamicVertexBuffer(graphicsDevice, instanceVertexDeclaration,
+                                                                       cubes.Count, BufferUsage.WriteOnly);
                     }
 
-                    instanceVertexBuffer = new DynamicVertexBuffer(graphicsDevice, instanceVertexDeclaration,
-                                                                   cubes.Length, BufferUsage.WriteOnly);
-                }
+                    instanceVertexBuffer.SetData(instanceTransforms, 0, instanceTransforms.Length, SetDataOptions.Discard);
 
-                instanceVertexBuffer.SetData(instanceTransforms, 0, instanceTransforms.Length, SetDataOptions.Discard);
-
-                foreach (ModelMesh mesh in instancedModel.Meshes)
-                {
-                    foreach (ModelMeshPart meshPart in mesh.MeshParts)
+                    foreach (ModelMesh mesh in instancedModel.Meshes)
                     {
-                        // Tell the GPU to read from both the model vertex buffer plus our instanceVertexBuffer.
-                        graphicsDevice.SetVertexBuffers(
-                            new VertexBufferBinding(meshPart.VertexBuffer, meshPart.VertexOffset, 0),
-                            new VertexBufferBinding(instanceVertexBuffer, 0, 1)
-                            );
-
-                        graphicsDevice.Indices = meshPart.IndexBuffer;
-
-                        // Set up the instance rendering effect.
-                        Effect effect = meshPart.Effect;
-
-                        effect.CurrentTechnique = effect.Techniques["SKraft"];
-
-                        effect.Parameters["World"].SetValue(instancedModelBones[mesh.ParentBone.Index]);
-                        effect.Parameters["View"].SetValue(Camera.ActiveCamera.View);
-                        effect.Parameters["Projection"].SetValue(Camera.ActiveCamera.Projection);
-                        //effect.Parameters["Texture"].SetValue(content.Load<Texture2D>(@"textures\texture2low2"));
-
-                        foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                        foreach (ModelMeshPart meshPart in mesh.MeshParts)
                         {
-                            pass.Apply();
+                            // Tell the GPU to read from both the model vertex buffer plus our instanceVertexBuffer.
+                            graphicsDevice.SetVertexBuffers(
+                                new VertexBufferBinding(meshPart.VertexBuffer, meshPart.VertexOffset, 0),
+                                new VertexBufferBinding(instanceVertexBuffer, 0, 1)
+                                );
 
-                            graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0,
-                                                                   meshPart.NumVertices, meshPart.StartIndex,
-                                                                   meshPart.PrimitiveCount, cubes.Length);
+                            graphicsDevice.Indices = meshPart.IndexBuffer;
+
+                            // Set up the instance rendering effect.
+                            Effect effect = meshPart.Effect;
+
+                            effect.CurrentTechnique = effect.Techniques["SKraft"];
+
+                            effect.Parameters["World"].SetValue(instancedModelBones[mesh.ParentBone.Index]);
+                            effect.Parameters["View"].SetValue(Camera.ActiveCamera.View);
+                            effect.Parameters["Projection"].SetValue(Camera.ActiveCamera.Projection);
+                            effect.Parameters["Texture"].SetValue(cubes[0].Texture);
+
+                            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                            {
+                                pass.Apply();
+
+                                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                                                                       meshPart.NumVertices, meshPart.StartIndex,
+                                                                       meshPart.PrimitiveCount, cubes.Count);                                
+                            }
                         }
                     }
                 }

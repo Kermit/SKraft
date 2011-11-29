@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content;
 using SKraft.Cameras;
 using SKraft.Cubes;
 using System.IO;
+using Microsoft.Xna.Framework.Input;
 
 namespace SKraft.MapGen
 {
@@ -32,6 +33,29 @@ namespace SKraft.MapGen
             internal Sector()
             {
                  Cubes = new List<Cube>();
+            }
+
+            private Vector3 CalculatePos(int x, int y, int z, int multipierX, int multipierZ, bool behind)
+            {
+                Vector3 position;
+
+                if (!behind)
+                {
+                    position = new Vector3((multipierX * SizeX) + x, y,
+                                                   (multipierZ * SizeZ) + z);
+                    Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
+                    if (cubePosPlayer.Z >= 0) //jeśli cube bedzie przed kamerą to wyświetlać
+                    {
+                        return new Vector3(0, SizeY + 1, 0);
+                    }
+                }
+                else
+                {
+                    position = new Vector3((multipierX * SizeX) + x, y,
+                                                   (multipierZ * SizeZ) + z);
+                }
+
+                return position;
             }
 
             /// <summary>
@@ -73,6 +97,8 @@ namespace SKraft.MapGen
                         fromZ = 0;
                     }
 
+                    Vector3 position;
+
                     for (int x = fromX; x < toX; ++x)
                     {
                         for (int y = fromY; y < toY; ++y)
@@ -81,23 +107,36 @@ namespace SKraft.MapGen
                             {
                                 switch (bytes[x, y, z])
                                 {
+                                    case 0:
+                                        break;
+
                                     case 1:
+                                        position = new Vector3((multipierX * SizeX) + x, y,
+                                                                       (multipierZ * SizeZ) + z);
                                         if (!behind)
                                         {
-                                            Vector3 position = new Vector3((multipierX*SizeX) + x, y,
-                                                                           (multipierZ*SizeZ) + z);
                                             Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
-                                            if (cubePosPlayer.Z < -1) //jeśli cube bedzie przed kamerą to wyświetlać
+                                            if (cubePosPlayer.Z >= 0) //jeśli cube bedzie przed kamerą to wyświetlać
                                             {
-                                                Cubes.Add(new SampleCube(position));
+                                                continue;
                                             }
                                         }
-                                        else
+
+                                        Cubes.Add(new Grass(position));
+                                        break;
+                                    case 2:
+                                        position = new Vector3((multipierX * SizeX) + x, y,
+                                                                       (multipierZ * SizeZ) + z);
+                                        if (!behind)
                                         {
-                                            Vector3 position = new Vector3((multipierX * SizeX) + x, y,
-                                                                           (multipierZ * SizeZ) + z);
-                                            Cubes.Add(new SampleCube(position));
+                                            Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
+                                            if (cubePosPlayer.Z >= 0) //jeśli cube bedzie przed kamerą to wyświetlać
+                                            {
+                                                continue;
+                                            }
                                         }
+
+                                        Cubes.Add(new Stone(position));
                                         break;
                                 }
                             }
@@ -316,7 +355,8 @@ namespace SKraft.MapGen
 
         public void LoadContent(ContentManager content)
         {
-            new SampleCube(Vector3.Zero).LoadContent(content);
+            new Grass(Vector3.Zero).LoadContent(content);
+            new Stone(Vector3.Zero).LoadContent(content);
         }
 
         private Cube[] GetCubes(Vector3 playerPos, int cubesLength, bool behind)
@@ -540,9 +580,9 @@ namespace SKraft.MapGen
                     sectors[2] = new Sector();
                     sectors[5] = new Sector();
                     sectors[8] = new Sector();
-                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 20);
-                    sectors[5].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y, 10);
-                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 20);
+                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 100);
+                    sectors[5].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y, 70);
+                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 100);
                 }
                 else
                 {
@@ -560,9 +600,9 @@ namespace SKraft.MapGen
                     sectors[0] = new Sector();
                     sectors[3] = new Sector();
                     sectors[6] = new Sector();
-                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 20);
-                    sectors[3].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y, 10);
-                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 20);
+                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 100);
+                    sectors[3].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y, 70);
+                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 100);
                 }
             }
             else
@@ -583,9 +623,9 @@ namespace SKraft.MapGen
                     sectors[6] = new Sector();
                     sectors[7] = new Sector();
                     sectors[8] = new Sector();
-                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 20);
-                    sectors[7].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y + 1, 10);
-                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 20);
+                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 100);
+                    sectors[7].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y + 1, 70);
+                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 100);
                 }
                 else
                 {
@@ -603,9 +643,9 @@ namespace SKraft.MapGen
                     sectors[0] = new Sector();
                     sectors[1] = new Sector();
                     sectors[2] = new Sector();
-                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 20);
-                    sectors[1].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y - 1, 10);
-                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 20);
+                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 100);
+                    sectors[1].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y - 1, 70);
+                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 100);
                 }
             }
         }
@@ -622,7 +662,7 @@ namespace SKraft.MapGen
         }
 
         public Cube[] GetNearestCubes(Vector3 position)
-        {
+        {         
             return GetCubes(position, 9, true);
         }
 
@@ -693,12 +733,8 @@ namespace SKraft.MapGen
         /// </summary>
         /// <param name="cube"></param>
         public void AddCube(Cube cube)
-        {
-            byte cubeByte = 0;
-            if (cube is SampleCube)
-            {
-                cubeByte = 1;
-            }
+        {            
+            byte cubeByte = (byte)cube.Index;
 
             int x = (int)(cube.Position.X - (currentSector.X * SectorSize.X));
             int y = (int)cube.Position.Y;
