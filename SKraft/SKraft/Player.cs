@@ -226,7 +226,7 @@ namespace SKraft
         {
             if (state.IsKeyDown(Keys.I))
             {
-                inHand = new Stone(Vector3.Zero);
+                inHand = new Cube(Vector3.Zero, Cube.CubeType.Stone);
             }
             if (inHand != null)
             {
@@ -456,8 +456,16 @@ namespace SKraft
                             newCubePos.X += 1;
                             break;
                     }
-
-                    map.AddCube(new Stone(newCubePos));
+                    
+                    if (inHand is Cube)
+                    {
+                        BoundingBox playerBBox = new BoundingBox(new Vector3(Position.X - 0.4f, Position.Y - 0.49f, Position.Z - 0.45f),
+                            new Vector3(Position.X + 0.45f, Position.Y + 1.0f, Position.Z + 0.45f));
+                        if (playerBBox.Contains(newCubePos) == ContainmentType.Disjoint)
+                        {
+                            map.AddCube(new Cube(newCubePos, ((Cube)inHand).TypeCube));
+                        }                        
+                    }
                 }
             }
         }

@@ -122,7 +122,7 @@ namespace SKraft.MapGen
                                             }
                                         }
 
-                                        Cubes.Add(new Grass(position));
+                                        Cubes.Add(new Cube(position, Cube.CubeType.Grass));
                                         break;
                                     case 2:
                                         position = new Vector3((multipierX * SizeX) + x, y,
@@ -136,7 +136,7 @@ namespace SKraft.MapGen
                                             }
                                         }
 
-                                        Cubes.Add(new Stone(position));
+                                        Cubes.Add(new Cube(position, Cube.CubeType.Stone));
                                         break;
                                 }
                             }
@@ -355,8 +355,8 @@ namespace SKraft.MapGen
 
         public void LoadContent(ContentManager content)
         {
-            new Grass(Vector3.Zero).LoadContent(content);
-            new Stone(Vector3.Zero).LoadContent(content);
+            new Cube(Vector3.Zero, Cube.CubeType.Grass).LoadContent(content);
+            new Cube(Vector3.Zero, Cube.CubeType.Stone).LoadContent(content);
         }
 
         private Cube[] GetCubes(Vector3 playerPos, int cubesLength, bool behind)
@@ -580,9 +580,9 @@ namespace SKraft.MapGen
                     sectors[2] = new Sector();
                     sectors[5] = new Sector();
                     sectors[8] = new Sector();
-                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 100);
-                    sectors[5].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y, 70);
-                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 100);
+                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 10);
+                    sectors[5].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y, 5);
+                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 10);
                 }
                 else
                 {
@@ -600,9 +600,9 @@ namespace SKraft.MapGen
                     sectors[0] = new Sector();
                     sectors[3] = new Sector();
                     sectors[6] = new Sector();
-                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 100);
-                    sectors[3].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y, 70);
-                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 100);
+                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 10);
+                    sectors[3].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y, 5);
+                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 10);
                 }
             }
             else
@@ -623,9 +623,9 @@ namespace SKraft.MapGen
                     sectors[6] = new Sector();
                     sectors[7] = new Sector();
                     sectors[8] = new Sector();
-                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 100);
-                    sectors[7].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y + 1, 70);
-                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 100);
+                    sectors[6].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y + 1, 10);
+                    sectors[7].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y + 1, 5);
+                    sectors[8].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y + 1, 10);
                 }
                 else
                 {
@@ -643,9 +643,9 @@ namespace SKraft.MapGen
                     sectors[0] = new Sector();
                     sectors[1] = new Sector();
                     sectors[2] = new Sector();
-                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 100);
-                    sectors[1].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y - 1, 70);
-                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 100);
+                    sectors[0].LoadSectorThread("Test", (int)currentSector.X - 1, (int)currentSector.Y - 1, 10);
+                    sectors[1].LoadSectorThread("Test", (int)currentSector.X, (int)currentSector.Y - 1, 5);
+                    sectors[2].LoadSectorThread("Test", (int)currentSector.X + 1, (int)currentSector.Y - 1, 10);
                 }
             }
         }
@@ -734,7 +734,7 @@ namespace SKraft.MapGen
         /// <param name="cube"></param>
         public void AddCube(Cube cube)
         {            
-            byte cubeByte = (byte)cube.Index;
+            byte cubeByte = (byte)cube.TypeCube;
 
             int x = (int)(cube.Position.X - (currentSector.X * SectorSize.X));
             int y = (int)cube.Position.Y;

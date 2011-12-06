@@ -27,16 +27,18 @@ namespace SKraft
         FpsCounter fpsCounter = new FpsCounter();
         private Texture2D crosshair;
         public static GraphicsDevice Graphics;
+        private Sun sun;
 
         public SKraft()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 800;
-            graphics.PreferredBackBufferHeight = 600;
+            graphics.PreferredBackBufferHeight = 600;            
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
             Graphics = GraphicsDevice;
 
+            sun = new Sun();
             Vector3 playerPos = new Vector3(1, 1, 1);
             Map = new Map(playerPos);
             player = new Player(this, playerPos, Map);
@@ -107,16 +109,18 @@ namespace SKraft
         protected override void Draw(GameTime gameTime)
         {
             int drawCalls = 0;
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            Graphics = GraphicsDevice;
 
             Debug.Start("drawing");
-            Map.Draw(GraphicsDevice);
+            sun.Draw();
+            Map.Draw(sun);
             player.Draw();
             Debug.Stop("drawing");
 
             spriteBatch.Begin();
             spriteBatch.Draw(crosshair,
-                new Vector2(GraphicsDevice.Viewport.Width / 2 - crosshair.Width / 2 + 5, GraphicsDevice.Viewport.Height / 2 - crosshair.Height / 2 + 5),
+                new Vector2(Graphics.Viewport.Width / 2 - crosshair.Width / 2 + 5, Graphics.Viewport.Height / 2 - crosshair.Height / 2 + 5),
                 Color.White);
             spriteBatch.End();
 

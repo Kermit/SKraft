@@ -41,6 +41,7 @@ namespace SKraft.MapGen
             memoryMap = new MemoryMap(playerPos, false);
             allCubes = new Cube[0];
             cubesList = new Dictionary<int, List<Cube>>();
+            
         }
 
         public void Initialize() { }
@@ -63,12 +64,12 @@ namespace SKraft.MapGen
 
             foreach (Cube cb in allCubes)
             {
-                if (!cubesList.ContainsKey(cb.Index))
+                if (!cubesList.ContainsKey((byte)cb.TypeCube))
                 {
-                    cubesList.Add(cb.Index, new List<Cube>());
+                    cubesList.Add((byte)cb.TypeCube, new List<Cube>());
                 }
 
-                cubesList[cb.Index].Add(cb);
+                cubesList[(byte)cb.TypeCube].Add(cb);
             }
         }
 
@@ -100,13 +101,13 @@ namespace SKraft.MapGen
             memoryMap.AddCube(cube);
         }
 
-        public void Draw(GraphicsDevice graphicsDevice)
+        public void Draw(Sun sun)
         {
             foreach (List<Cube> cubes in cubesList.Values)
             {
                 if (cubes.Count > 0)
                 {
-                    Debug.AddString("Drawing cubes: " + cubes.Count);
+                    Debug.AddString("Drawing cubes " + cubes[0].TypeCube + ": "  + cubes.Count);
                     Array.Resize(ref instanceTransforms, cubes.Count);
 
                     for (int i = 0; i < cubes.Count; i++)
@@ -123,7 +124,7 @@ namespace SKraft.MapGen
                             instanceVertexBuffer.Dispose();
                         }
 
-                        instanceVertexBuffer = new DynamicVertexBuffer(graphicsDevice, instanceVertexDeclaration,
+                        instanceVertexBuffer = new DynamicVertexBuffer(SKraft.Graphics, instanceVertexDeclaration,
                                                                        cubes.Count, BufferUsage.WriteOnly);
                     }
 
@@ -134,12 +135,12 @@ namespace SKraft.MapGen
                         foreach (ModelMeshPart meshPart in mesh.MeshParts)
                         {
                             // Tell the GPU to read from both the model vertex buffer plus our instanceVertexBuffer.
-                            graphicsDevice.SetVertexBuffers(
+                            SKraft.Graphics.SetVertexBuffers(
                                 new VertexBufferBinding(meshPart.VertexBuffer, meshPart.VertexOffset, 0),
                                 new VertexBufferBinding(instanceVertexBuffer, 0, 1)
                                 );
 
-                            graphicsDevice.Indices = meshPart.IndexBuffer;
+                            SKraft.Graphics.Indices = meshPart.IndexBuffer;
 
                             // Set up the instance rendering effect.
                             Effect effect = meshPart.Effect;
@@ -150,12 +151,13 @@ namespace SKraft.MapGen
                             effect.Parameters["View"].SetValue(Camera.ActiveCamera.View);
                             effect.Parameters["Projection"].SetValue(Camera.ActiveCamera.Projection);
                             effect.Parameters["Texture"].SetValue(cubes[0].Texture);
+                            effect.Parameters["LightPower"].SetValue(sun.Light);
 
                             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
                             {
                                 pass.Apply();
 
-                                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                                SKraft.Graphics.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0,
                                                                        meshPart.NumVertices, meshPart.StartIndex,
                                                                        meshPart.PrimitiveCount, cubes.Count);                                
                             }

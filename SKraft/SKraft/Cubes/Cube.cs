@@ -9,17 +9,9 @@ using SKraft.MapGen;
 
 namespace SKraft.Cubes
 {
-    public abstract class Cube : Object3D
+    public class Cube : Object3D
     {
-        public int Index { get; protected set; }
-        public Texture2D Texture
-        {
-            get
-            {
-                return texture;
-            }
-        }
-
+        private static Model cubeModel;
         public struct Bonus
         {
             public Type type;
@@ -46,21 +38,77 @@ namespace SKraft.Cubes
 
         public enum Side { Bottom = 0, Back = 1, Left = 2, Front = 3, Right = 4, Up = 5 }
 
-        public abstract void LoadContent(ContentManager content);
-
-        protected static Model cubeModel;
         private List<Bonus> bonusObjects = new List<Bonus>();
         public List<Bonus> BonusObjects 
         {
             get { return bonusObjects; }
         }
 
-        public Cube(Vector3 position)
+        public enum CubeType { Grass = 1, Stone = 2 }
+        public CubeType TypeCube { get; private set; }
+        private static Texture2D[] textures;
+        public Texture2D Texture
+        {
+            get
+            {
+                return textures[(byte)TypeCube - 1];
+            }
+        }
+
+        public Cube(Vector3 position, CubeType cubeType)
         {
             this.Position = position;
 
             BBox = new BoundingBox(new Vector3(Position.X - 0.5f, Position.Y - 0.5f, Position.Z - 0.5f),
                             new Vector3(Position.X + 0.5f, Position.Y + 0.5f, Position.Z + 0.5f));
+
+            Bonus bonus;
+            this.TypeCube = cubeType;
+            model = cubeModel;
+
+            if (textures != null)
+            {
+                texture = Texture;
+            }
+
+            switch (cubeType)
+            {
+                case CubeType.Grass:
+                    this.life = 100;
+                    this.name = "Grass";
+                    this.Power = 20;
+                    bonus = new Bonus {type = typeof(Cube), bonus = 0};
+                    this.BonusObjects.Add(bonus);
+
+                    break;
+
+                case CubeType.Stone:
+                    this.life = 300;
+                    this.name = "Stone";
+                    this.Power = 20;
+                    bonus = new Bonus { type = typeof(Cube), bonus = 0 };
+                    this.BonusObjects.Add(bonus);
+
+                    break;
+            }
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            if (cubeModel == null)
+            {
+                cubeModel = content.Load<Model>(@"models\cubeNoInst");
+            }
+
+            if (textures == null)
+            {
+                textures = new Texture2D[2];
+                textures[0] = content.Load<Texture2D>(@"textures\texturegrass");
+                textures[1] = content.Load<Texture2D>(@"textures\texturestone");
+            }
+
+            this.texture = Texture;
+            model = cubeModel;
         }
 
         /// <summary>
