@@ -27,6 +27,7 @@ namespace SKraft
         FpsCounter fpsCounter = new FpsCounter();
         private Texture2D crosshair;
         public static GraphicsDevice Graphics;
+        public static ContentManager SKraftContent;
         private Sun sun;
 
         public SKraft()
@@ -37,9 +38,10 @@ namespace SKraft
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
             Graphics = GraphicsDevice;
+            SKraftContent = this.Content;
 
             sun = new Sun();
-            Vector3 playerPos = new Vector3(1, 1, 1);
+            Vector3 playerPos = new Vector3(15, 1, 1);
             Map = new Map(playerPos);
             player = new Player(this, playerPos, Map);
             Components.Add(new Debug(this));
@@ -67,9 +69,9 @@ namespace SKraft
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             crosshair = Content.Load<Texture2D>("crosshair");
-            Map.LoadContent(Content);
-
+            
             player.LoadContent();
+            Map.LoadContent(Content);            
             // TODO: use this.Content to load your game content here
         }
 

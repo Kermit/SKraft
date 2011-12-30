@@ -15,12 +15,12 @@ namespace SKraft
         private Timer timer = new Timer(500);
         private bool grow;
         private readonly float day = 120.0f;
-        Color skyboxColor = new Color(0, 0, 20);
+        Color skyboxColor = new Color(20, 150, 235);
 
         public Sun()
         {
-            Light = 3;
-            grow = true;
+            Light = 12;
+            grow = false;
             timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
             timer.Start();
         }
@@ -40,7 +40,7 @@ namespace SKraft
                 skyboxColor.G += (byte)(150 / day);
                 skyboxColor.B += (byte)(235 / day);
 
-                if (Light > 15)
+                if (Light > 13)
                 {
                     grow = false;
                 }

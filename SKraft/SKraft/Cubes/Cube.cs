@@ -51,6 +51,16 @@ namespace SKraft.Cubes
         {
             get
             {
+                if (((byte)TypeCube) > textures.Length)
+                {
+                    return textures[textures.Length - 1];
+                }
+
+                if (((byte)TypeCube)  <= 0)
+                {
+                    return textures[0];
+                }
+
                 return textures[(byte)TypeCube - 1];
             }
         }
@@ -74,7 +84,7 @@ namespace SKraft.Cubes
             switch (cubeType)
             {
                 case CubeType.Grass:
-                    this.life = 100;
+                    this.life = 101;
                     this.name = "Grass";
                     this.Power = 20;
                     bonus = new Bonus {type = typeof(Cube), bonus = 0};

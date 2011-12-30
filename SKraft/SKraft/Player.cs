@@ -8,6 +8,7 @@ using SKraft.Cameras;
 using Microsoft.Xna.Framework.Input;
 using SKraft.Cubes;
 using SKraft.MapGen;
+using SKraft.Tools;
 
 namespace SKraft
 {
@@ -37,6 +38,12 @@ namespace SKraft
         private bool up = true;
         private bool jump = false;
 
+        //Mysz
+        private int lastWheelValue = 0;
+
+        //Hand inventory
+        Dictionary<int, Object3D> inHandInventory = new Dictionary<int, Object3D>();
+
         /// <summary>
         /// Określa obiekt będący w dłoni gracza
         /// </summary>
@@ -59,7 +66,11 @@ namespace SKraft
 
         public void LoadContent()
         {
-            model = game.Content.Load<Model>(@"models\player");            
+            model = game.Content.Load<Model>(@"models\player");
+            inHandInventory.Add(0, new Cube(Vector3.Zero, Cube.CubeType.Grass));
+            inHandInventory.Add(1, new Cube(Vector3.Zero, Cube.CubeType.Stone));
+            inHandInventory.Add(2, new Axe(Vector3.Zero));
+            inHandInventory.Add(3, new Pickaxe(Vector3.Zero));
         }
 
         public override void Update(GameTime gameTime)
@@ -224,10 +235,29 @@ namespace SKraft
 
         private void UpdateItemInHand(KeyboardState state)
         {
-            if (state.IsKeyDown(Keys.I))
+            //modulo przez liczbe elementow
+            int scroll = Math.Abs((Mouse.GetState().ScrollWheelValue / 120) % 4);
+           
+            Debug.AddString("Scroll: " + scroll + " " + Mouse.GetState().ScrollWheelValue);
+
+            if (state.IsKeyDown(Keys.I) || lastWheelValue != scroll)
             {
-                inHand = new Cube(Vector3.Zero, Cube.CubeType.Stone);
+                if (scroll == 2)
+                {
+                    inHand = new Axe(Vector3.Zero);
+                }
+                else if (scroll == 3)
+                {
+                    inHand = new Pickaxe(Vector3.Zero);
+                }
+                else
+                {
+                    inHand = new Cube(Vector3.Zero, (Cube.CubeType)scroll + 1);
+                }
+
+                //inHand = inHandInventory[scroll];
             }
+
             if (inHand != null)
             {
                 Matrix matrix = Matrix.CreateRotationX(-target.Y) * Matrix.CreateRotationY(-target.X)
@@ -237,6 +267,8 @@ namespace SKraft
                 inHand.RotationX = -target.Y - clickingCount / 70f;
                 inHand.Scale = 0.2f;
             }
+
+            lastWheelValue = scroll;
         }
 
         public void Move(Vector3 move)
@@ -459,8 +491,8 @@ namespace SKraft
                     
                     if (inHand is Cube)
                     {
-                        BoundingBox playerBBox = new BoundingBox(new Vector3(Position.X - 0.4f, Position.Y - 0.49f, Position.Z - 0.45f),
-                            new Vector3(Position.X + 0.45f, Position.Y + 1.0f, Position.Z + 0.45f));
+                        BoundingBox playerBBox = new BoundingBox(new Vector3(Position.X - 0.55f, Position.Y - 1.5f, Position.Z - 0.55f),
+                            new Vector3(Position.X + 0.55f, Position.Y + 1.5f, Position.Z + 0.55f));
                         if (playerBBox.Contains(newCubePos) == ContainmentType.Disjoint)
                         {
                             map.AddCube(new Cube(newCubePos, ((Cube)inHand).TypeCube));

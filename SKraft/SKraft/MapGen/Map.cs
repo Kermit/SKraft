@@ -101,8 +101,28 @@ namespace SKraft.MapGen
             memoryMap.AddCube(cube);
         }
 
+        Vector3 lightDirection = new Vector3(0, 10, 0);
+        bool lightgrow = false;
         public void Draw(Sun sun)
         {
+            if (!lightgrow)
+            {
+                lightDirection.Y += 0.1f;
+
+                if (lightDirection.Y > 100)
+                {
+                    lightgrow = true;
+                }
+            }
+            else
+            {
+                lightDirection.Y -= 0.1f;
+
+                if (lightDirection.Y < 1)
+                {
+                    lightgrow = false;
+                }
+            }
             foreach (List<Cube> cubes in cubesList.Values)
             {
                 if (cubes.Count > 0)
@@ -152,6 +172,7 @@ namespace SKraft.MapGen
                             effect.Parameters["Projection"].SetValue(Camera.ActiveCamera.Projection);
                             effect.Parameters["Texture"].SetValue(cubes[0].Texture);
                             effect.Parameters["LightPower"].SetValue(sun.Light);
+                            effect.Parameters["LightDirection"].SetValue(lightDirection);
 
                             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
                             {

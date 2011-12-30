@@ -110,12 +110,13 @@ namespace SKraft
                             {
                                 effect.Texture = texture;
                             }
-
                             effect.EnableDefaultLighting();
                             effect.World = transforms[mesh.ParentBone.Index] *
+                                Matrix.CreateRotationX(MathHelper.ToRadians(-180)) *
+                                Matrix.CreateRotationZ(MathHelper.ToRadians(180)) *
                                            Matrix.CreateScale(Scale) *
                                            Matrix.CreateRotationX(RotationX) *
-                                           Matrix.CreateRotationY(RotationY) * 
+                                           Matrix.CreateRotationY(RotationY) *
                                            Matrix.CreateTranslation(Position);
                             effect.View = Camera.ActiveCamera.View;
                             effect.Projection = Camera.ActiveCamera.Projection;
