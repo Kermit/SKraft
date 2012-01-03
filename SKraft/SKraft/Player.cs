@@ -56,7 +56,8 @@ namespace SKraft
             this.map = map;
             fppCamera = new FppCamera(game, new Vector3(position.X, position.Y + 1, position.Z), Vector3.Zero, Vector3.Up);
 
-            mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            Viewport viewport = game.GraphicsDevice.Viewport;
+            mousePos = new Vector2(viewport.Width / 2.0f, viewport.Height / 2.0f);
             Speed = 0.1f;
             jumpSpeed = 0;
             MouseSpeed = 10;
@@ -76,9 +77,10 @@ namespace SKraft
         public override void Update(GameTime gameTime)
         {
             bool mapUpdate = false;
+            MouseState mouseState = Mouse.GetState();
 
-            target.X += (Mouse.GetState().X - mousePos.X) * MouseSpeed / 1000;
-            target.Y += (Mouse.GetState().Y - mousePos.Y) * MouseSpeed / 1000;
+            target.X += (mouseState.X - mousePos.X) * MouseSpeed / 1000;
+            target.Y += (mouseState.Y - mousePos.Y) * MouseSpeed / 1000;
 
             if (MathHelper.ToDegrees(target.Y) > 90)
             {
@@ -88,33 +90,7 @@ namespace SKraft
             {
                 target.Y = MathHelper.ToRadians(-90);
             }
-            mousePos.X = Mouse.GetState().X;
-            mousePos.Y = Mouse.GetState().Y;
-
-            if (game.IsActive)
-            {
-                if (mousePos.X <= 0)
-                {
-                    mousePos.X = game.GraphicsDevice.Viewport.Width;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
-                }
-                else if (mousePos.X >= game.GraphicsDevice.Viewport.Width)
-                {
-                    mousePos.X = 0;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
-                }
-
-                if (mousePos.Y <= 0)
-                {
-                    mousePos.Y = 0;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
-                }
-                else if (mousePos.Y >= game.GraphicsDevice.Viewport.Height)
-                {
-                    mousePos.Y = game.GraphicsDevice.Viewport.Height;
-                    Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
-                }
-            }
+            Mouse.SetPosition((int)mousePos.X, (int)mousePos.Y);
 
             Matrix forwardMovement = Matrix.CreateRotationY(target.X);
             KeyboardState state = Keyboard.GetState();
@@ -184,18 +160,18 @@ namespace SKraft
             fppCamera.Move(v);
             Move(v);
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (mouseState.LeftButton == ButtonState.Pressed)
             {
                 MouseClickLeft(ref mapUpdate);
             }
-            else if (Mouse.GetState().LeftButton == ButtonState.Released)
+            else if (mouseState.LeftButton == ButtonState.Released)
             {
                 clickingCount = 0;
                 clickingCountPositive = true;
                 clickingCube = null;
             }
             
-            if (Mouse.GetState().RightButton == ButtonState.Pressed)
+            if (mouseState.RightButton == ButtonState.Pressed)
             {
                 if (!rightPressed)
                 {
@@ -204,7 +180,7 @@ namespace SKraft
                     mapUpdate = true;
                 }
             }
-            else if (Mouse.GetState().RightButton == ButtonState.Released)
+            else if (mouseState.RightButton == ButtonState.Released)
             {
                 rightPressed = false;
             }
