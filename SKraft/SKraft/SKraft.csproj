@@ -115,6 +115,8 @@
     <Compile Include="FpsCounter.cs" />
     <Compile Include="MapGen\Map.cs" />
     <Compile Include="MapGen\MemoryMap.cs" />
+    <Compile Include="Menu\Button.cs" />
+    <Compile Include="Menu\Menu.cs" />
     <Compile Include="Object3D.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
