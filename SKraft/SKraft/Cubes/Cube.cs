@@ -44,7 +44,7 @@ namespace SKraft.Cubes
             get { return bonusObjects; }
         }
 
-        public enum CubeType { Grass = 1, Stone = 2 }
+        public enum CubeType { Grass = 1, Stone = 2, Earth = 3, Lave = 4, Wood = 5 }
         public CubeType TypeCube { get; private set; }
         private static Texture2D[] textures;
         public Texture2D Texture
@@ -84,7 +84,7 @@ namespace SKraft.Cubes
             switch (cubeType)
             {
                 case CubeType.Grass:
-                    this.life = 101;
+                    this.life = 400;
                     this.name = "Grass";
                     this.Power = 20;
                     bonus = new Bonus {type = typeof(Cube), bonus = 0};
@@ -93,8 +93,35 @@ namespace SKraft.Cubes
                     break;
 
                 case CubeType.Stone:
-                    this.life = 300;
+                    this.life = 800;
                     this.name = "Stone";
+                    this.Power = 20;
+                    bonus = new Bonus { type = typeof(Cube), bonus = 0 };
+                    this.BonusObjects.Add(bonus);
+
+                    break;
+
+                case CubeType.Earth:
+                    this.life = 200;
+                    this.name = "Earth";
+                    this.Power = 20;
+                    bonus = new Bonus { type = typeof(Cube), bonus = 0 };
+                    this.BonusObjects.Add(bonus);
+
+                    break;
+
+                case CubeType.Lave:
+                    this.life = 1000;
+                    this.name = "Lave";
+                    this.Power = 20;
+                    bonus = new Bonus { type = typeof(Cube), bonus = 0 };
+                    this.BonusObjects.Add(bonus);
+
+                    break;
+
+                case CubeType.Wood:
+                    this.life = 600;
+                    this.name = "Wood";
                     this.Power = 20;
                     bonus = new Bonus { type = typeof(Cube), bonus = 0 };
                     this.BonusObjects.Add(bonus);
@@ -112,9 +139,12 @@ namespace SKraft.Cubes
 
             if (textures == null)
             {
-                textures = new Texture2D[2];
+                textures = new Texture2D[5];
                 textures[0] = content.Load<Texture2D>(@"textures\texturegrass");
                 textures[1] = content.Load<Texture2D>(@"textures\texturestone");
+                textures[2] = content.Load<Texture2D>(@"textures\textureearth");
+                textures[3] = content.Load<Texture2D>(@"textures\texturelave");
+                textures[4] = content.Load<Texture2D>(@"textures\texturewood");                                 
             }
 
             this.texture = Texture;

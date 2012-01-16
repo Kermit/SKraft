@@ -138,6 +138,48 @@ namespace SKraft.MapGen
 
                                         Cubes.Add(new Cube(position, Cube.CubeType.Stone));
                                         break;
+                                    case 3:
+                                        position = new Vector3((multipierX * SizeX) + x, y,
+                                                                       (multipierZ * SizeZ) + z);
+                                        if (!behind)
+                                        {
+                                            Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
+                                            if (cubePosPlayer.Z >= 0) //jeśli cube bedzie przed kamerą to wyświetlać
+                                            {
+                                                continue;
+                                            }
+                                        }
+
+                                        Cubes.Add(new Cube(position, Cube.CubeType.Earth));
+                                        break;
+                                    case 4:
+                                        position = new Vector3((multipierX * SizeX) + x, y,
+                                                                       (multipierZ * SizeZ) + z);
+                                        if (!behind)
+                                        {
+                                            Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
+                                            if (cubePosPlayer.Z >= 0) //jeśli cube bedzie przed kamerą to wyświetlać
+                                            {
+                                                continue;
+                                            }
+                                        }
+
+                                        Cubes.Add(new Cube(position, Cube.CubeType.Lave));
+                                        break;
+                                    case 5:
+                                        position = new Vector3((multipierX * SizeX) + x, y,
+                                                                       (multipierZ * SizeZ) + z);
+                                        if (!behind)
+                                        {
+                                            Vector3 cubePosPlayer = Vector3.Transform(position, Camera.ActiveCamera.View);
+                                            if (cubePosPlayer.Z >= 0) //jeśli cube bedzie przed kamerą to wyświetlać
+                                            {
+                                                continue;
+                                            }
+                                        }
+
+                                        Cubes.Add(new Cube(position, Cube.CubeType.Wood));
+                                        break;
                                 }
                             }
                         }

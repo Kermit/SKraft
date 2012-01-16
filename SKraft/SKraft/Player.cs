@@ -47,7 +47,7 @@ namespace SKraft
         /// <summary>
         /// Określa obiekt będący w dłoni gracza
         /// </summary>
-        private Object3D inHand;
+        public static Object3D inHand { get; private set; }
 
         public Player(SKraft game, Vector3 position, Map map)
         {
@@ -236,17 +236,17 @@ namespace SKraft
         private void UpdateItemInHand(KeyboardState state)
         {
             //modulo przez liczbe elementow
-            int scroll = Math.Abs((Mouse.GetState().ScrollWheelValue / 120) % 4);
+            int scroll = Math.Abs((Mouse.GetState().ScrollWheelValue / 120) % 7);
            
             Debug.AddString("Scroll: " + scroll + " " + Mouse.GetState().ScrollWheelValue);
 
             if (state.IsKeyDown(Keys.I) || lastWheelValue != scroll)
             {
-                if (scroll == 2)
+                if (scroll == 5)
                 {
                     inHand = new Axe(Vector3.Zero);
                 }
-                else if (scroll == 3)
+                else if (scroll == 6)
                 {
                     inHand = new Pickaxe(Vector3.Zero);
                 }
